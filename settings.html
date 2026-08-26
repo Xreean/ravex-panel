@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ guild.name }} - Ayarlar | Ravex</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1e1f22;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #2b2d31;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1a1b1e;
+        }
+        .navbar h1 { font-size: 18px; }
+        .navbar a { color: #00a8fc; text-decoration: none; font-size: 14px; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-info img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        .btn {
+            display: inline-block;
+            transition: background 0.15s;
+            padding: 8px 16px;
+            background: #5865F2;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { background: #4752c4; }
+        .btn-danger { background: #ed4245; }
+        .btn-danger:hover { background: #c73c3e; }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .section {
+            background: #2b2d31;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #f2f3f5;
+            border-bottom: 1px solid #3f4147;
+            padding-bottom: 10px;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #3f4147;
+        }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-label { font-size: 14px; color: #dbdee1; }
+        .setting-value {
+            font-size: 13px;
+            color: #b5bac1;
+            background: #1e1f22;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .badge-on {
+            background: #23a559;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .badge-off {
+            background: #4e5058;
+            color: #b5bac1;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #00a8fc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div style="display:flex; align-items:center; gap:16px;">
+            <a href="/" style="color:#00a8fc; text-decoration:none; font-size:14px;">← Sunucular</a>
+            <h1 style="font-size:18px;">{{ guild.name }}</h1>
+        </div>
+        <div class="user-info">
+            {% if user.avatar %}
+            <img src="https://cdn.discordapp.com/avatars/{{ user.id }}/{{ user.avatar }}.png" alt="">
+            {% endif %}
+            <span>{{ user.username }}</span>
+            <a class="btn btn-danger" href="/logout">Çıkış</a>
+        </div>
+    </div>
+
+    <div class="container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div style="background:#23a559; color:white; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Genel Roller -->
+        <div class="section">
+            <h2>⚙️ Genel Roller</h2>
+
+            {% set role_settings = [
+                ('ust_yetkili_rol', 'Üst Yetkili Rol'),
+                ('yetkili_rol', 'Yetkili Rol'),
+                ('oto_rol', 'Oto Rol'),
+                ('kayitsiz_rol', 'Kayıtsız Rol'),
+                ('aile_rol', 'Aile Rol'),
+                ('jail_rol', 'Jail Rol')
+            ] %}
+
+            {% for key, label in role_settings %}
+            <div class="setting-row">
+                <span class="setting-label">{{ label }}</span>
+                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                    <input type="hidden" name="key" value="{{ key }}">
+                    <select name="value" style="background:#1e1f22; border:1px solid #3f4147; color:#fff; padding:6px 10px; border-radius:4px; width:200px; font-size:13px;">
+                        <option value="">— Seçilmedi —</option>
+                        {% for role in roles %}
+                        <option value="{{ role.id }}" {% if settings.get(key)|string == role.id|string %}selected{% endif %}>
+                            {{ role.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn" style="padding:6px 12px; font-size:12px;">Kaydet</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Kanallar -->
+        <div class="section">
+            <h2>📜 Kanallar</h2>
+
+            {% set channel_settings = [
+                ('log_kanali', 'Moderasyon Log'),
+                ('ticket_log_kanali', 'Ticket Log'),
+                ('kurallar_kanali', 'Kurallar Kanalı'),
+                ('hosgeldin_kanali', 'Hoş Geldin Kanalı'),
+                ('tuzak_kanali', 'Bot Tuzağı Kanalı')
+            ] %}
+
+            {% for key, label in channel_settings %}
+            <div class="setting-row">
+                <span class="setting-label">{{ label }}</span>
+                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                    <input type="hidden" name="key" value="{{ key }}">
+                    <select name="value" style="background:#1e1f22; border:1px solid #3f4147; color:#fff; padding:6px 10px; border-radius:4px; width:200px; font-size:13px;">
+                        <option value="">— Seçilmedi —</option>
+                        {% for channel in channels %}
+                        <option value="{{ channel.id }}" {% if settings.get(key)|string == channel.id|string %}selected{% endif %}>
+                            #{{ channel.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn" style="padding:6px 12px; font-size:12px;">Kaydet</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Guard -->
+        <div class="section">
+            <h2>🛡️ Guard (Koruma)</h2>
+
+            <div class="setting-row">
+                <span class="setting-label">Kanal Koruması</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_kanal">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_kanal') else 'badge-off' }}" style="border:none; cursor:pointer;">
+                        {{ 'Açık' if settings.get('guard_kanal') else 'Kapalı' }}
+                    </button>
+                </form>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">Rol Koruması</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_rol">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_rol') else 'badge-off' }}" style="border:none; cursor:pointer;">
+                        {{ 'Açık' if settings.get('guard_rol') else 'Kapalı' }}
+                    </button>
+                </form>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">Bot Koruması</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_bot">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_bot') else 'badge-off' }}" style="border:none; cursor:pointer;">
+                        {{ 'Açık' if settings.get('guard_bot') else 'Kapalı' }}
+                    </button>
+                </form>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">Webhook Koruması</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_webhook">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_webhook') else 'badge-off' }}" style="border:none; cursor:pointer;">
+                        {{ 'Açık' if settings.get('guard_webhook') else 'Kapalı' }}
+                    </button>
+                </form>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">Sağ Tık Ban/Kick</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_rightclick">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_rightclick') else 'badge-off' }}" style="border:none; cursor:pointer;">
+                        {{ 'Açık' if settings.get('guard_rightclick') else 'Kapalı' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Nick Sistemi -->
+        <div class="section">
+            <h2>📛 Nick Sistemi</h2>
+            <div class="setting-row">
+                <span class="setting-label">İsim | Yaş Nick</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/oto_nick">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}" style="border:none; cursor:pointer;">
+                        {{ 'Açık' if settings.get('oto_nick') else 'Kapalı' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Küfür Listesi -->
+        <div class="section">
+            <h2>🤬 Küfür Filtresi</h2>
+
+            <form method="POST" action="/guild/{{ guild.id }}/kufur" style="display:flex; gap:8px; margin-bottom:16px;">
+                <input type="hidden" name="action" value="ekle">
+                <input type="text" name="kelime" placeholder="Eklenecek kelime"
+                       style="background:#1e1f22; border:1px solid #3f4147; color:#fff; padding:8px 12px; border-radius:4px; flex:1; font-size:13px;">
+                <button type="submit" class="btn" style="padding:8px 16px; font-size:13px;">Ekle</button>
+            </form>
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+                {% set kufur_listesi = settings.get('kufur_listesi', ['amk', 'aq', 'orospu', 'piç', 'sik', 'yarrak', 'ibne', 'göt']) %}
+                {% for kelime in kufur_listesi %}
+                <form method="POST" action="/guild/{{ guild.id }}/kufur" style="display:inline;">
+                    <input type="hidden" name="action" value="sil">
+                    <input type="hidden" name="kelime" value="{{ kelime }}">
+                    <button type="submit"
+                            style="background:#3f4147; color:#dbdee1; border:none; padding:5px 10px; border-radius:4px; font-size:12px; cursor:pointer;">
+                        {{ kelime }} ✕
+                    </button>
+                </form>
+                {% endfor %}
+            </div>
+
+            <form method="POST" action="/guild/{{ guild.id }}/kufur">
+                <input type="hidden" name="action" value="sifirla">
+                <button type="submit" class="btn btn-danger" style="padding:6px 14px; font-size:12px;">
+                    Listeyi Varsayılana Sıfırla
+                </button>
+            </form>
+        </div>
