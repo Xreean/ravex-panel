@@ -16,8 +16,8 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 # MongoDB
 MONGO_URI = os.getenv("MONGO_URI")
 mongo_client = MongoClient(MONGO_URI) if MONGO_URI else None
-mongo_db = mongo_client["ravex"] if mongo_client else None
-settings_collection = mongo_db["ayarlar"] if mongo_db else None
+mongo_db = mongo_client["ravex"] if mongo_client is not None else None
+settings_collection = mongo_db["ayarlar"] if mongo_db is not None else None
 
 # Discord OAuth
 oauth = OAuth(app)
