@@ -3,3 +3,4 @@ authlib
 python-dotenv
 requests
 gunicorn
+pymongo
