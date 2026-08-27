@@ -41,10 +41,14 @@
             font-size: 14px;
             font-weight: 600;
             transition: background 0.15s;
+            border: none;
+            cursor: pointer;
         }
         .btn:hover { background: #4752c4; }
         .btn-danger { background: #ed4245; }
         .btn-danger:hover { background: #c73c3e; }
+        .btn-success { background: #23a559; }
+        .btn-success:hover { background: #1e8e4b; }
         .container {
             max-width: 900px;
             margin: 40px auto;
@@ -60,11 +64,21 @@
         }
         .login-box h1 { margin-bottom: 12px; }
         .login-box p { color: #b5bac1; margin-bottom: 24px; }
+        .section-title {
+            font-size: 18px;
+            margin-top: 32px;
+            margin-bottom: 8px;
+        }
+        .section-desc {
+            color: #b5bac1;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
         .guild-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 16px;
-            margin-top: 24px;
+            margin-bottom: 20px;
         }
         .guild-card {
             background: #2b2d31;
@@ -73,7 +87,6 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            cursor: pointer;
             transition: background 0.15s;
             text-decoration: none;
             color: inherit;
@@ -102,10 +115,16 @@
             color: #b5bac1;
             margin-top: 2px;
         }
+        .guild-card-actions {
+            margin-left: auto;
+        }
         .empty {
             text-align: center;
             color: #b5bac1;
-            margin-top: 60px;
+            margin-top: 40px;
+            padding: 30px;
+            background: #2b2d31;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -123,8 +142,45 @@
     </div>
 
     <div class="container">
-        <h2>Yönetilebilir Sunucular</h2>
-        <p style="color:#b5bac1; margin-top:6px;">Sadece botun bulunduğu ve yetkili olduğun sunucular listelenir.</p>
+
+        <!-- BOT EKLENMEMİŞ SUNUCULAR -->
+        <h2 class="section-title">Botu Ekle</h2>
+        <p class="section-desc">Bot henüz bu sunucularda yok. Eklemek için butona tıkla.</p>
+
+        {% if guilds_without_bot %}
+        <div class="guild-grid">
+            {% for guild in guilds_without_bot %}
+            <div class="guild-card">
+                <div class="guild-icon">
+                    {% if guild.icon %}
+                    <img src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" alt="">
+                    {% else %}
+                    {{ guild.name[:1] }}
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="guild-name">{{ guild.name }}</div>
+                    <div class="guild-badge">{% if guild.owner %}Sahip{% else %}Yönetici{% endif %}</div>
+                </div>
+                <div class="guild-card-actions">
+                    <a class="btn btn-success"
+                       href="https://discord.com/oauth2/authorize?client_id={{ client_id }}&permissions=8&scope=bot%20applications.commands&guild_id={{ guild.id }}&disable_guild_select=true"
+                       target="_blank">
+                        Botu Ekle
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty" style="margin-top:0;">
+            <p>Eklenebilecek başka sunucu yok.</p>
+        </div>
+        {% endif %}
+
+        <!-- BOTUN OLDUĞU SUNUCULAR -->
+        <h2 class="section-title">Yönetilebilir Sunucular</h2>
+        <p class="section-desc">Botun bulunduğu sunucular. Ayarlamak için tıkla.</p>
 
         {% if guilds %}
         <div class="guild-grid">
@@ -139,21 +195,18 @@
                 </div>
                 <div>
                     <div class="guild-name">{{ guild.name }}</div>
-                    <div class="guild-badge">
-                        {% if guild.owner %}Sahip{% else %}Yönetici{% endif %}
-                    </div>
+                    <div class="guild-badge">{% if guild.owner %}Sahip{% else %}Yönetici{% endif %}</div>
                 </div>
             </a>
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty">
-            <p style="font-size:16px; margin-bottom:8px;">Yönetebileceğin sunucu bulunamadı.</p>
-            <p style="font-size:14px; color:#949ba4;">
-                Botu sunucuya eklediğinden ve <strong>Administrator</strong> yetkisine sahip olduğundan emin ol.
-            </p>
+        <div class="empty" style="margin-top:0;">
+            <p>Bot henüz hiçbir sunucunda yok.</p>
+            <p style="margin-top:8px; font-size:14px;">Yukarıdan bir sunucuya ekleyip sayfayı yenile.</p>
         </div>
         {% endif %}
+
     </div>
 
     {% else %}
