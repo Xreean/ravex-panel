@@ -79,23 +79,34 @@ def get_bot_guilds():
         print(f"get_bot_guilds hata: {e}")
     return set()
 
-def get_user_manageable_guilds(user_guilds, bot_guild_ids):
-    manageable = []
+def get_user_guilds_split(user_guilds, bot_guild_ids):
+    """Botun olduğu ve olmadığı sunucuları ayırır"""
+    with_bot = []
+    without_bot = []
+
     for guild in user_guilds:
         guild_id = guild["id"]
-        if guild_id not in bot_guild_ids:
-            continue
         permissions = int(guild.get("permissions", 0))
         is_owner = guild.get("owner", False)
         is_admin = (permissions & 0x8) == 0x8
-        if is_owner or is_admin:
-            manageable.append({
-                "id": guild_id,
-                "name": guild["name"],
-                "icon": guild.get("icon"),
-                "owner": is_owner
-            })
-    return manageable
+
+        # Sadece yönetici / sahip olduğu sunucular
+        if not (is_owner or is_admin):
+            continue
+
+        info = {
+            "id": guild_id,
+            "name": guild["name"],
+            "icon": guild.get("icon"),
+            "owner": is_owner
+        }
+
+        if guild_id in bot_guild_ids:
+            with_bot.append(info)
+        else:
+            without_bot.append(info)
+
+    return with_bot, without_bot
 
 def get_guild_roles(guild_id):
     token = os.getenv("DISCORD_TOKEN")
@@ -135,7 +146,15 @@ def get_guild_channels(guild_id):
 def index():
     user = session.get("user")
     guilds = session.get("guilds", [])
-    return render_template("index.html", user=user, guilds=guilds)
+    guilds_without_bot = session.get("guilds_without_bot", [])
+    client_id = os.getenv("DISCORD_CLIENT_ID")
+    return render_template(
+        "index.html",
+        user=user,
+        guilds=guilds,
+        guilds_without_bot=guilds_without_bot,
+        client_id=client_id
+    )
 
 @app.route("/login")
 def login():
@@ -153,11 +172,15 @@ def callback():
         "avatar": user.get("avatar"),
         "discriminator": user.get("discriminator", "0")
     }
+
     guilds_resp = discord.get("users/@me/guilds")
     user_guilds = guilds_resp.json()
     bot_guild_ids = get_bot_guilds()
-    manageable = get_user_manageable_guilds(user_guilds, bot_guild_ids)
-    session["guilds"] = manageable
+
+    with_bot, without_bot = get_user_guilds_split(user_guilds, bot_guild_ids)
+    session["guilds"] = with_bot
+    session["guilds_without_bot"] = without_bot
+
     return redirect("/")
 
 @app.route("/logout")
