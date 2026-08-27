@@ -6,13 +6,14 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
+
 # .env dosyasını yükle (bir üst klasördeki)
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 MONGO_URI = os.getenv("MONGO_URI")
-client = MongoClient(MONGO_URI)
-db = client["ravex"]
-settings_collection = db["ayarlar"]
+mongo_client = MongoClient(MONGO_URI)
+mongo_db = mongo_client["ravex"]
+settings_collection = mongo_db["ayarlar"]
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -110,37 +111,48 @@ def logout():
 
 def load_settings():
     data = {}
-    for doc in settings_collection.find():
-        guild_id = doc.get("_id")
-        if guild_id:
+    try:
+        for doc in settings_collection.find():
+            guild_id = str(doc.get("_id", ""))
+            if not guild_id:
+                continue
             ayarlar = dict(doc)
             ayarlar.pop("_id", None)
-            data[str(guild_id)] = ayarlar
+            data[guild_id] = ayarlar
+    except Exception as e:
+        print(f"load_settings hata: {e}")
     return data
 
 def save_settings(data):
-    for guild_id, ayarlar in data.items():
-        settings_collection.update_one(
-            {"_id": str(guild_id)},
-            {"$set": ayarlar},
-            upsert=True
-        )
+    try:
+        for guild_id, ayarlar in data.items():
+            settings_collection.update_one(
+                {"_id": str(guild_id)},
+                {"$set": ayarlar},
+                upsert=True
+            )
+    except Exception as e:
+        print(f"save_settings hata: {e}")
 
-def get_guild_roles(guild_id):
-    """Bot token ile sunucudaki rolleri çeker"""
-    token = os.getenv("DISCORD_TOKEN")
-    headers = {"Authorization": f"Bot {token}"}
-    response = requests.get(
-        f"https://discord.com/api/guilds/{guild_id}/roles",
-        headers=headers
-    )
-    if response.status_code == 200:
-        roles = response.json()
-        # @everyone hariç, isme göre sırala
-        roles = [r for r in roles if r["name"] != "@everyone"]
-        roles.sort(key=lambda r: r["name"].lower())
-        return roles
-    return []
+def set_guild_setting(guild_id, key, value):
+    """Tek bir ayarı doğrudan MongoDB'ye yazar"""
+    try:
+        if value is None or value == "":
+            settings_collection.update_one(
+                {"_id": str(guild_id)},
+                {"$unset": {key: ""}},
+                upsert=True
+            )
+        else:
+            settings_collection.update_one(
+                {"_id": str(guild_id)},
+                {"$set": {key: value}},
+                upsert=True
+            )
+        return True
+    except Exception as e:
+        print(f"set_guild_setting hata: {e}")
+        return False
 
 def get_guild_channels(guild_id):
     """Bot token ile sunucudaki yazı kanallarını çeker"""
@@ -209,19 +221,50 @@ def toggle_setting(guild_id, key):
         return "Geçersiz ayar.", 400
 
     settings = load_settings()
-    if guild_id not in settings:
-        settings[guild_id] = {}
-
-    # Mevcut değerin tersini al
-    current = settings[guild_id].get(key, False)
-    settings[guild_id][key] = not current
-    save_settings(settings)
+    current = settings.get(guild_id, {}).get(key, False)
+    set_guild_setting(guild_id, key, not current)
 
     return redirect(f"/guild/{guild_id}")
 
     save_settings(settings)
     flash("Ayar güncellendi.", "success")
     return redirect(f"/guild/{guild_id}")
+
+def get_guild_roles(guild_id):
+    """Bot token ile sunucudaki rolleri çeker"""
+    token = os.getenv("DISCORD_TOKEN")
+    headers = {"Authorization": f"Bot {token}"}
+    try:
+        response = requests.get(
+            f"https://discord.com/api/guilds/{guild_id}/roles",
+            headers=headers
+        )
+        if response.status_code == 200:
+            roles = response.json()
+            roles = [r for r in roles if r["name"] != "@everyone"]
+            roles.sort(key=lambda r: r["name"].lower())
+            return roles
+    except Exception as e:
+        print(f"get_guild_roles hata: {e}")
+    return []
+
+def get_guild_channels(guild_id):
+    """Bot token ile sunucudaki yazı kanallarını çeker"""
+    token = os.getenv("DISCORD_TOKEN")
+    headers = {"Authorization": f"Bot {token}"}
+    try:
+        response = requests.get(
+            f"https://discord.com/api/guilds/{guild_id}/channels",
+            headers=headers
+        )
+        if response.status_code == 200:
+            channels = response.json()
+            text_channels = [c for c in channels if c["type"] == 0]
+            text_channels.sort(key=lambda c: c["name"].lower())
+            return text_channels
+    except Exception as e:
+        print(f"get_guild_channels hata: {e}")
+    return []
 
 @app.route("/guild/<guild_id>/update", methods=["POST"])
 def update_setting(guild_id):
@@ -238,33 +281,21 @@ def update_setting(guild_id):
     value = request.form.get("value", "").strip()
 
     allowed_keys = [
-        "ust_yetkili_rol",
-        "yetkili_rol",
-        "oto_rol",
-        "kayitsiz_rol",
-        "aile_rol",
-        "jail_rol",
-        "log_kanali",
-        "ticket_log_kanali",
-        "kurallar_kanali",
-        "hosgeldin_kanali",
-        "tuzak_kanali"
+        "ust_yetkili_rol", "yetkili_rol", "oto_rol",
+        "kayitsiz_rol", "aile_rol", "jail_rol",
+        "log_kanali", "ticket_log_kanali",
+        "kurallar_kanali", "hosgeldin_kanali", "tuzak_kanali"
     ]
     if key not in allowed_keys:
         return "Geçersiz ayar.", 400
 
-    settings = load_settings()
-    if guild_id not in settings:
-        settings[guild_id] = {}
-
     if value == "":
-        settings[guild_id].pop(key, None)
+        set_guild_setting(guild_id, key, None)
     else:
         if not value.isdigit():
             return "Geçersiz ID.", 400
-        settings[guild_id][key] = int(value)
+        set_guild_setting(guild_id, key, int(value))
 
-    save_settings(settings)
     flash("Ayar kaydedildi.", "success")
     return redirect(f"/guild/{guild_id}")
 
