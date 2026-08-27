@@ -1,0 +1,5 @@
+flask
+authlib
+python-dotenv
+requests
+gunicorn

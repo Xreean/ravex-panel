@@ -1,0 +1,299 @@
+import os
+import json
+import requests
+from flask import Flask, redirect, url_for, session, render_template, request, flash, get_flashed_messages
+from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
+
+# .env dosyasını yükle (bir üst klasördeki)
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
+app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY")
+
+# Discord OAuth ayarları
+oauth = OAuth(app)
+discord = oauth.register(
+    name="discord",
+    client_id=os.getenv("DISCORD_CLIENT_ID"),
+    client_secret=os.getenv("DISCORD_CLIENT_SECRET"),
+    access_token_url="https://discord.com/api/oauth2/token",
+    authorize_url="https://discord.com/api/oauth2/authorize",
+    api_base_url="https://discord.com/api/",
+    client_kwargs={"scope": "identify guilds"}
+)
+
+def get_bot_guilds():
+    """Botun bulunduğu sunucuları Discord API'den çeker"""
+    token = os.getenv("DISCORD_TOKEN")
+    headers = {"Authorization": f"Bot {token}"}
+    response = requests.get("https://discord.com/api/users/@me/guilds", headers=headers)
+    if response.status_code == 200:
+        return {g["id"] for g in response.json()}
+    return set()
+
+def get_user_manageable_guilds(user_guilds, bot_guild_ids):
+    """
+    Kullanıcının yönetebileceği sunucuları filtreler.
+    Koşullar:
+    - Bot o sunucuda olmalı
+    - Kullanıcı owner veya ADMINISTRATOR yetkisine sahip olmalı
+    """
+    manageable = []
+    for guild in user_guilds:
+        guild_id = guild["id"]
+        if guild_id not in bot_guild_ids:
+            continue
+
+        # permissions değeri bitfield'dır. 0x8 = ADMINISTRATOR
+        permissions = int(guild.get("permissions", 0))
+        is_owner = guild.get("owner", False)
+        is_admin = (permissions & 0x8) == 0x8
+
+        if is_owner or is_admin:
+            manageable.append({
+                "id": guild_id,
+                "name": guild["name"],
+                "icon": guild.get("icon"),
+                "owner": is_owner
+            })
+    return manageable
+
+@app.route("/")
+def index():
+    user = session.get("user")
+    guilds = session.get("guilds", [])
+    return render_template("index.html", user=user, guilds=guilds)
+
+@app.route("/login")
+def login():
+    redirect_uri = url_for("callback", _external=True)
+    return discord.authorize_redirect(redirect_uri)
+
+@app.route("/callback")
+def callback():
+    token = discord.authorize_access_token()
+
+    # Kullanıcı bilgisi
+    resp = discord.get("users/@me")
+    user = resp.json()
+    session["user"] = {
+        "id": user["id"],
+        "username": user["username"],
+        "avatar": user.get("avatar"),
+        "discriminator": user.get("discriminator", "0")
+    }
+
+    # Kullanıcının sunucuları
+    guilds_resp = discord.get("users/@me/guilds")
+    user_guilds = guilds_resp.json()
+
+    # Botun bulunduğu sunucular
+    bot_guild_ids = get_bot_guilds()
+
+    # Yetkili olduğu + botun olduğu sunucular
+    manageable = get_user_manageable_guilds(user_guilds, bot_guild_ids)
+    session["guilds"] = manageable
+
+    return redirect("/")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+def load_settings():
+    settings_path = os.path.join(os.path.dirname(__file__), "..", "ayarlar.json")
+    if os.path.exists(settings_path):
+        with open(settings_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+def save_settings(data):
+    settings_path = os.path.join(os.path.dirname(__file__), "..", "ayarlar.json")
+    with open(settings_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+def get_guild_roles(guild_id):
+    """Bot token ile sunucudaki rolleri çeker"""
+    token = os.getenv("DISCORD_TOKEN")
+    headers = {"Authorization": f"Bot {token}"}
+    response = requests.get(
+        f"https://discord.com/api/guilds/{guild_id}/roles",
+        headers=headers
+    )
+    if response.status_code == 200:
+        roles = response.json()
+        # @everyone hariç, isme göre sırala
+        roles = [r for r in roles if r["name"] != "@everyone"]
+        roles.sort(key=lambda r: r["name"].lower())
+        return roles
+    return []
+
+def get_guild_channels(guild_id):
+    """Bot token ile sunucudaki yazı kanallarını çeker"""
+    token = os.getenv("DISCORD_TOKEN")
+    headers = {"Authorization": f"Bot {token}"}
+    response = requests.get(
+        f"https://discord.com/api/guilds/{guild_id}/channels",
+        headers=headers
+    )
+    if response.status_code == 200:
+        channels = response.json()
+        # Sadece yazı kanalları (type 0)
+        text_channels = [c for c in channels if c["type"] == 0]
+        text_channels.sort(key=lambda c: c["name"].lower())
+        return text_channels
+    return []
+
+@app.route("/guild/<guild_id>")
+def guild_settings(guild_id):
+    user = session.get("user")
+    if not user:
+        return redirect("/")
+
+    guilds = session.get("guilds", [])
+    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    if not guild:
+        return "Bu sunucuyu yönetme yetkin yok.", 403
+
+    settings = load_settings()
+    guild_settings = settings.get(guild_id, {})
+
+    roles = get_guild_roles(guild_id)
+    channels = get_guild_channels(guild_id)
+
+    return render_template(
+        "settings.html",
+        user=user,
+        guild=guild,
+        settings=guild_settings,
+        roles=roles,
+        channels=channels
+    )
+
+@app.route("/guild/<guild_id>/toggle/<key>", methods=["POST"])
+def toggle_setting(guild_id, key):
+    user = session.get("user")
+    if not user:
+        return redirect("/")
+
+    # Yetki kontrolü
+    guilds = session.get("guilds", [])
+    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    if not guild:
+        return "Yetkin yok.", 403
+
+    # Sadece izin verilen anahtarlar
+    allowed_keys = [
+        "guard_kanal",
+        "guard_rol",
+        "guard_bot",
+        "guard_webhook",
+        "guard_rightclick",
+        "oto_nick"
+    ]
+    if key not in allowed_keys:
+        return "Geçersiz ayar.", 400
+
+    settings = load_settings()
+    if guild_id not in settings:
+        settings[guild_id] = {}
+
+    # Mevcut değerin tersini al
+    current = settings[guild_id].get(key, False)
+    settings[guild_id][key] = not current
+    save_settings(settings)
+
+    return redirect(f"/guild/{guild_id}")
+
+    save_settings(settings)
+    flash("Ayar güncellendi.", "success")
+    return redirect(f"/guild/{guild_id}")
+
+@app.route("/guild/<guild_id>/update", methods=["POST"])
+def update_setting(guild_id):
+    user = session.get("user")
+    if not user:
+        return redirect("/")
+
+    guilds = session.get("guilds", [])
+    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    if not guild:
+        return "Yetkin yok.", 403
+
+    key = request.form.get("key")
+    value = request.form.get("value", "").strip()
+
+    allowed_keys = [
+        "ust_yetkili_rol",
+        "yetkili_rol",
+        "oto_rol",
+        "kayitsiz_rol",
+        "aile_rol",
+        "jail_rol",
+        "log_kanali",
+        "ticket_log_kanali",
+        "kurallar_kanali",
+        "hosgeldin_kanali",
+        "tuzak_kanali"
+    ]
+    if key not in allowed_keys:
+        return "Geçersiz ayar.", 400
+
+    settings = load_settings()
+    if guild_id not in settings:
+        settings[guild_id] = {}
+
+    if value == "":
+        settings[guild_id].pop(key, None)
+    else:
+        if not value.isdigit():
+            return "Geçersiz ID.", 400
+        settings[guild_id][key] = int(value)
+
+    save_settings(settings)
+    flash("Ayar kaydedildi.", "success")
+    return redirect(f"/guild/{guild_id}")
+
+@app.route("/guild/<guild_id>/kufur", methods=["POST"])
+def kufur_islem(guild_id):
+    user = session.get("user")
+    if not user:
+        return redirect("/")
+
+    guilds = session.get("guilds", [])
+    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    if not guild:
+        return "Yetkin yok.", 403
+
+    action = request.form.get("action")
+    kelime = request.form.get("kelime", "").strip().lower()
+
+    settings = load_settings()
+    if guild_id not in settings:
+        settings[guild_id] = {}
+
+    # Varsayılan liste (botundakiyle aynı)
+    VARSAYILAN = ["amk", "aq", "orospu", "piç", "sik", "yarrak", "ibne", "göt"]
+
+    if "kufur_listesi" not in settings[guild_id]:
+        settings[guild_id]["kufur_listesi"] = list(VARSAYILAN)
+
+    liste = settings[guild_id]["kufur_listesi"]
+
+    if action == "ekle" and kelime:
+        if kelime not in liste:
+            liste.append(kelime)
+    elif action == "sil" and kelime:
+        if kelime in liste:
+            liste.remove(kelime)
+    elif action == "sifirla":
+        settings[guild_id]["kufur_listesi"] = list(VARSAYILAN)
+
+    save_settings(settings)
+    flash("Küfür listesi güncellendi.", "success")
+    return redirect(f"/guild/{guild_id}")
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
