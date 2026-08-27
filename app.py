@@ -9,6 +9,11 @@ from pymongo import MongoClient
 # .env dosyasını yükle (bir üst klasördeki)
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
+MONGO_URI = os.getenv("MONGO_URI")
+client = MongoClient(MONGO_URI)
+db = client["ravex"]
+settings_collection = db["ayarlar"]
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -104,16 +109,22 @@ def logout():
     return redirect("/")
 
 def load_settings():
-    settings_path = os.path.join(os.path.dirname(__file__), "..", "ayarlar.json")
-    if os.path.exists(settings_path):
-        with open(settings_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
+    data = {}
+    for doc in settings_collection.find():
+        guild_id = doc.get("_id")
+        if guild_id:
+            ayarlar = dict(doc)
+            ayarlar.pop("_id", None)
+            data[str(guild_id)] = ayarlar
+    return data
 
 def save_settings(data):
-    settings_path = os.path.join(os.path.dirname(__file__), "..", "ayarlar.json")
-    with open(settings_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+    for guild_id, ayarlar in data.items():
+        settings_collection.update_one(
+            {"_id": str(guild_id)},
+            {"$set": ayarlar},
+            upsert=True
+        )
 
 def get_guild_roles(guild_id):
     """Bot token ile sunucudaki rolleri çeker"""
