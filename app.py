@@ -4,6 +4,7 @@ import requests
 from flask import Flask, redirect, url_for, session, render_template, request, flash, get_flashed_messages
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 # .env dosyasını yükle (bir üst klasördeki)
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
