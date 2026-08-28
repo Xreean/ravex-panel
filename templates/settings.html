@@ -55,6 +55,34 @@
             border-right: 1px solid rgba(255,255,255,0.06);
             padding: 24px 14px;
             background: #12151b;
+            transition: width 0.2s ease, padding 0.2s ease;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: 56px;
+            padding: 16px 8px;
+        }
+        .sidebar.collapsed .sidebar-title,
+        .sidebar.collapsed .side-item-text {
+            display: none;
+        }
+        .sidebar-toggle {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #c5c8d0;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .sidebar-toggle:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
         }
         .sidebar-title {
             font-size: 11px;
@@ -65,7 +93,9 @@
             padding: 0 10px 12px;
         }
         .side-item {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             width: 100%;
             text-align: left;
             background: transparent;
@@ -162,13 +192,9 @@
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid rgba(255,255,255,0.06);
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
                 padding: 14px;
             }
-            .sidebar-title { width: 100%; }
-            .side-item { width: auto; }
+            .sidebar.collapsed { width: 100%; }
         }
     </style>
 </head>
@@ -188,15 +214,31 @@
     </nav>
 
     <div class="layout">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
+            <button type="button" class="sidebar-toggle" id="sidebarToggle" title="Menüyü aç/kapa">⋯</button>
             <div class="sidebar-title">Kategoriler</div>
-            <button type="button" class="side-item active" data-panel="roller">Genel Roller</button>
-            <button type="button" class="side-item" data-panel="kanallar">Kanallar</button>
-            <button type="button" class="side-item" data-panel="guard">Guard (Koruma)</button>
-            <button type="button" class="side-item" data-panel="nick">Nick Sistemi</button>
-            <button type="button" class="side-item" data-panel="seviye">📊 Seviye Sistemi</button>
-            <button type="button" class="side-item" data-panel="dogumgunu">🎂 Doğum Günü</button>
-            <button type="button" class="side-item" data-panel="kufur">Küfür Filtresi</button>
+
+            <button type="button" class="side-item active" data-panel="roller">
+                <span>⚙️</span><span class="side-item-text">Genel Roller</span>
+            </button>
+            <button type="button" class="side-item" data-panel="kanallar">
+                <span>📜</span><span class="side-item-text">Kanallar</span>
+            </button>
+            <button type="button" class="side-item" data-panel="guard">
+                <span>🛡️</span><span class="side-item-text">Guard (Koruma)</span>
+            </button>
+            <button type="button" class="side-item" data-panel="nick">
+                <span>📛</span><span class="side-item-text">Nick Sistemi</span>
+            </button>
+            <button type="button" class="side-item" data-panel="seviye">
+                <span>📊</span><span class="side-item-text">Seviye Sistemi</span>
+            </button>
+            <button type="button" class="side-item" data-panel="dogumgunu">
+                <span>🎂</span><span class="side-item-text">Doğum Günü</span>
+            </button>
+            <button type="button" class="side-item" data-panel="kufur">
+                <span>🤬</span><span class="side-item-text">Küfür Filtresi</span>
+            </button>
         </aside>
 
         <main class="content">
@@ -400,6 +442,8 @@
     <script>
         const items = document.querySelectorAll('.side-item');
         const panels = document.querySelectorAll('.panel');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
 
         function showPanel(id) {
             items.forEach(btn => {
@@ -415,11 +459,22 @@
             btn.addEventListener('click', () => showPanel(btn.dataset.panel));
         });
 
-        // Kaydet sonrası aynı sekmede kalsın
         const saved = localStorage.getItem('ravex_settings_panel');
         if (saved && document.getElementById('panel-' + saved)) {
             showPanel(saved);
         }
+
+        if (localStorage.getItem('ravex_sidebar_collapsed') === '1') {
+            sidebar.classList.add('collapsed');
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem(
+                'ravex_sidebar_collapsed',
+                sidebar.classList.contains('collapsed') ? '1' : '0'
+            );
+        });
     </script>
 </body>
 </html>
