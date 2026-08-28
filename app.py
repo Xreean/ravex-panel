@@ -146,14 +146,39 @@ def get_guild_channels(guild_id):
 def index():
     user = session.get("user")
     client_id = os.getenv("DISCORD_CLIENT_ID")
-    guilds = session.get("guilds", [])
-    guilds_without_bot = session.get("guilds_without_bot", [])
+
+    if not user:
+        return render_template(
+            "index.html",
+            user=None,
+            guilds=[],
+            guilds_without_bot=[],
+            client_id=client_id
+        )
+
+    all_guilds = session.get("all_manageable_guilds")
+    if not all_guilds:
+        all_guilds = session.get("guilds", []) + session.get("guilds_without_bot", [])
+
+    bot_guild_ids = {str(x) for x in get_bot_guilds()}
+
+    with_bot = []
+    without_bot = []
+    for g in all_guilds:
+        gid = str(g["id"])
+        if gid in bot_guild_ids:
+            with_bot.append(g)
+        else:
+            without_bot.append(g)
+
+    session["guilds"] = with_bot
+    session["guilds_without_bot"] = without_bot
 
     return render_template(
         "index.html",
         user=user,
-        guilds=guilds,
-        guilds_without_bot=guilds_without_bot,
+        guilds=with_bot,
+        guilds_without_bot=without_bot,
         client_id=client_id
     )
 
@@ -185,6 +210,17 @@ def callback():
         "avatar": user.get("avatar"),
         "discriminator": user.get("discriminator", "0")
     }
+
+    guilds_resp = discord.get("users/@me/guilds")
+    user_guilds = guilds_resp.json()
+    bot_guild_ids = get_bot_guilds()
+
+    with_bot, without_bot = get_user_guilds_split(user_guilds, bot_guild_ids)
+    session["guilds"] = with_bot
+    session["guilds_without_bot"] = without_bot
+    session["all_manageable_guilds"] = with_bot + without_bot
+
+    return redirect("/")
 
     guilds_resp = discord.get("users/@me/guilds")
     user_guilds = guilds_resp.json()
