@@ -3,25 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ guild.name }} - Ayarlar | Ravex</title>
+    <title>{{ guild.name }} — Ayarlar | Ravex</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #1e1f22;
-            color: #fff;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0f1115;
+            color: #e8eaed;
             min-height: 100vh;
         }
         .navbar {
-            background: #2b2d31;
-            padding: 16px 32px;
+            background: rgba(20, 22, 28, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #1a1b1e;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
-        .navbar h1 { font-size: 18px; }
-        .navbar a { color: #00a8fc; text-decoration: none; font-size: 14px; }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .nav-left a {
+            color: #8b90a0;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .nav-left a:hover { color: #e8eaed; }
+        .nav-left h1 {
+            font-size: 16px;
+            font-weight: 600;
+        }
         .user-info {
             display: flex;
             align-items: center;
@@ -32,85 +51,139 @@
             height: 32px;
             border-radius: 50%;
         }
+        .user-info span { font-size: 13px; color: #c5c8d0; }
         .btn {
-            display: inline-block;
-            transition: background 0.15s;
-            padding: 8px 16px;
-            background: #5865F2;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: 600;
+            text-decoration: none;
             border: none;
             cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
         }
-        .btn:hover { background: #4752c4; }
-        .btn-danger { background: #ed4245; }
-        .btn-danger:hover { background: #c73c3e; }
+        .btn-primary { background: #5865F2; color: #fff; }
+        .btn-primary:hover { background: #4752c4; }
+        .btn-danger {
+            background: rgba(237,66,69,0.15);
+            color: #ff6b6e;
+            border: 1px solid rgba(237,66,69,0.25);
+        }
         .container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 0 20px;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+        }
+        .flash {
+            background: rgba(35,165,89,0.15);
+            border: 1px solid rgba(35,165,89,0.35);
+            color: #3dd68c;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 500;
         }
         .section {
-            background: #2b2d31;
-            border-radius: 10px;
-            padding: 24px;
-            margin-bottom: 20px;
+            background: #171a21;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 16px;
         }
         .section h2 {
-            font-size: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #8b90a0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
             margin-bottom: 16px;
-            color: #f2f3f5;
-            border-bottom: 1px solid #3f4147;
-            padding-bottom: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 0;
-            border-bottom: 1px solid #3f4147;
+            gap: 16px;
         }
-        .setting-row:last-child { border-bottom: none; }
-        .setting-label { font-size: 14px; color: #dbdee1; }
-        .setting-value {
+        .setting-row + .setting-row {
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .setting-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #dbdee1;
+        }
+        select, input[type="text"] {
+            background: #0f1115;
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #e8eaed;
+            padding: 8px 12px;
+            border-radius: 8px;
             font-size: 13px;
-            color: #b5bac1;
-            background: #1e1f22;
-            padding: 4px 10px;
-            border-radius: 4px;
+            font-family: inherit;
+            min-width: 200px;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #5865F2;
+        }
+        .badge-on, .badge-off {
+            border: none;
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
         }
         .badge-on {
-            background: #23a559;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 12px;
+            background: rgba(35,165,89,0.2);
+            color: #3dd68c;
         }
         .badge-off {
-            background: #4e5058;
-            color: #b5bac1;
-            padding: 3px 10px;
-            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+            color: #8b90a0;
+        }
+        .kufur-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .kufur-form input { flex: 1; min-width: 0; }
+        .kufur-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .kufur-tag {
+            background: rgba(255,255,255,0.06);
+            color: #c5c8d0;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
             font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
         }
-        .back {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #00a8fc;
-            text-decoration: none;
-            font-size: 14px;
+        .kufur-tag:hover {
+            background: rgba(237,66,69,0.2);
+            color: #ff6b6e;
         }
-        .back:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div style="display:flex; align-items:center; gap:16px;">
-            <a href="/" style="color:#00a8fc; text-decoration:none; font-size:14px;">← Sunucular</a>
-            <h1 style="font-size:18px;">{{ guild.name }}</h1>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/">← Sunucular</a>
+            <h1>{{ guild.name }}</h1>
         </div>
         <div class="user-info">
             {% if user.avatar %}
@@ -119,23 +192,19 @@
             <span>{{ user.username }}</span>
             <a class="btn btn-danger" href="/logout">Çıkış</a>
         </div>
-    </div>
+    </nav>
 
     <div class="container">
-                {% with messages = get_flashed_messages(with_categories=true) %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                <div style="background:#23a559; color:white; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">
-                    {{ message }}
-                </div>
+                <div class="flash">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- Genel Roller -->
         <div class="section">
-            <h2>⚙️ Genel Roller</h2>
-
+            <h2>Genel Roller</h2>
             {% set role_settings = [
                 ('ust_yetkili_rol', 'Üst Yetkili Rol'),
                 ('yetkili_rol', 'Yetkili Rol'),
@@ -144,13 +213,12 @@
                 ('aile_rol', 'Aile Rol'),
                 ('jail_rol', 'Jail Rol')
             ] %}
-
             {% for key, label in role_settings %}
             <div class="setting-row">
                 <span class="setting-label">{{ label }}</span>
                 <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
                     <input type="hidden" name="key" value="{{ key }}">
-                    <select name="value" style="background:#1e1f22; border:1px solid #3f4147; color:#fff; padding:6px 10px; border-radius:4px; width:200px; font-size:13px;">
+                    <select name="value">
                         <option value="">— Seçilmedi —</option>
                         {% for role in roles %}
                         <option value="{{ role.id }}" {% if settings.get(key)|string == role.id|string %}selected{% endif %}>
@@ -158,16 +226,14 @@
                         </option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn" style="padding:6px 12px; font-size:12px;">Kaydet</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
                 </form>
             </div>
             {% endfor %}
         </div>
 
-        <!-- Kanallar -->
         <div class="section">
-            <h2>📜 Kanallar</h2>
-
+            <h2>Kanallar</h2>
             {% set channel_settings = [
                 ('log_kanali', 'Moderasyon Log'),
                 ('ticket_log_kanali', 'Ticket Log'),
@@ -175,13 +241,12 @@
                 ('hosgeldin_kanali', 'Hoş Geldin Kanalı'),
                 ('tuzak_kanali', 'Bot Tuzağı Kanalı')
             ] %}
-
             {% for key, label in channel_settings %}
             <div class="setting-row">
                 <span class="setting-label">{{ label }}</span>
                 <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
                     <input type="hidden" name="key" value="{{ key }}">
-                    <select name="value" style="background:#1e1f22; border:1px solid #3f4147; color:#fff; padding:6px 10px; border-radius:4px; width:200px; font-size:13px;">
+                    <select name="value">
                         <option value="">— Seçilmedi —</option>
                         {% for channel in channels %}
                         <option value="{{ channel.id }}" {% if settings.get(key)|string == channel.id|string %}selected{% endif %}>
@@ -189,104 +254,67 @@
                         </option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn" style="padding:6px 12px; font-size:12px;">Kaydet</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
                 </form>
             </div>
             {% endfor %}
         </div>
 
-        <!-- Guard -->
         <div class="section">
-            <h2>🛡️ Guard (Koruma)</h2>
-
+            <h2>Guard (Koruma)</h2>
+            {% set guards = [
+                ('guard_kanal', 'Kanal Koruması'),
+                ('guard_rol', 'Rol Koruması'),
+                ('guard_bot', 'Bot Koruması'),
+                ('guard_webhook', 'Webhook Koruması'),
+                ('guard_rightclick', 'Sağ Tık Ban/Kick')
+            ] %}
+            {% for key, label in guards %}
             <div class="setting-row">
-                <span class="setting-label">Kanal Koruması</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_kanal">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_kanal') else 'badge-off' }}" style="border:none; cursor:pointer;">
-                        {{ 'Açık' if settings.get('guard_kanal') else 'Kapalı' }}
+                <span class="setting-label">{{ label }}</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}">
+                    <button type="submit" class="{{ 'badge-on' if settings.get(key) else 'badge-off' }}">
+                        {{ 'Açık' if settings.get(key) else 'Kapalı' }}
                     </button>
                 </form>
             </div>
-
-            <div class="setting-row">
-                <span class="setting-label">Rol Koruması</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_rol">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_rol') else 'badge-off' }}" style="border:none; cursor:pointer;">
-                        {{ 'Açık' if settings.get('guard_rol') else 'Kapalı' }}
-                    </button>
-                </form>
-            </div>
-
-            <div class="setting-row">
-                <span class="setting-label">Bot Koruması</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_bot">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_bot') else 'badge-off' }}" style="border:none; cursor:pointer;">
-                        {{ 'Açık' if settings.get('guard_bot') else 'Kapalı' }}
-                    </button>
-                </form>
-            </div>
-
-            <div class="setting-row">
-                <span class="setting-label">Webhook Koruması</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_webhook">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_webhook') else 'badge-off' }}" style="border:none; cursor:pointer;">
-                        {{ 'Açık' if settings.get('guard_webhook') else 'Kapalı' }}
-                    </button>
-                </form>
-            </div>
-
-            <div class="setting-row">
-                <span class="setting-label">Sağ Tık Ban/Kick</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/guard_rightclick">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('guard_rightclick') else 'badge-off' }}" style="border:none; cursor:pointer;">
-                        {{ 'Açık' if settings.get('guard_rightclick') else 'Kapalı' }}
-                    </button>
-                </form>
-            </div>
+            {% endfor %}
         </div>
 
-        <!-- Nick Sistemi -->
         <div class="section">
-            <h2>📛 Nick Sistemi</h2>
+            <h2>Nick Sistemi</h2>
             <div class="setting-row">
                 <span class="setting-label">İsim | Yaş Nick</span>
                 <form method="POST" action="/guild/{{ guild.id }}/toggle/oto_nick">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}" style="border:none; cursor:pointer;">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}">
                         {{ 'Açık' if settings.get('oto_nick') else 'Kapalı' }}
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Küfür Listesi -->
         <div class="section">
-            <h2>🤬 Küfür Filtresi</h2>
-
-            <form method="POST" action="/guild/{{ guild.id }}/kufur" style="display:flex; gap:8px; margin-bottom:16px;">
+            <h2>Küfür Filtresi</h2>
+            <form method="POST" action="/guild/{{ guild.id }}/kufur" class="kufur-form">
                 <input type="hidden" name="action" value="ekle">
-                <input type="text" name="kelime" placeholder="Eklenecek kelime"
-                       style="background:#1e1f22; border:1px solid #3f4147; color:#fff; padding:8px 12px; border-radius:4px; flex:1; font-size:13px;">
-                <button type="submit" class="btn" style="padding:8px 16px; font-size:13px;">Ekle</button>
+                <input type="text" name="kelime" placeholder="Eklenecek kelime">
+                <button type="submit" class="btn btn-primary">Ekle</button>
             </form>
-
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+            <div class="kufur-tags">
                 {% set kufur_listesi = settings.get('kufur_listesi', ['amk', 'aq', 'orospu', 'piç', 'sik', 'yarrak', 'ibne', 'göt']) %}
                 {% for kelime in kufur_listesi %}
                 <form method="POST" action="/guild/{{ guild.id }}/kufur" style="display:inline;">
                     <input type="hidden" name="action" value="sil">
                     <input type="hidden" name="kelime" value="{{ kelime }}">
-                    <button type="submit"
-                            style="background:#3f4147; color:#dbdee1; border:none; padding:5px 10px; border-radius:4px; font-size:12px; cursor:pointer;">
-                        {{ kelime }} ✕
-                    </button>
+                    <button type="submit" class="kufur-tag">{{ kelime }} ×</button>
                 </form>
                 {% endfor %}
             </div>
-
             <form method="POST" action="/guild/{{ guild.id }}/kufur">
                 <input type="hidden" name="action" value="sifirla">
-                <button type="submit" class="btn btn-danger" style="padding:6px 14px; font-size:12px;">
-                    Listeyi Varsayılana Sıfırla
-                </button>
+                <button type="submit" class="btn btn-danger">Listeyi Varsayılana Sıfırla</button>
             </form>
         </div>
+    </div>
+</body>
+</html>
