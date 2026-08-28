@@ -14,10 +14,9 @@
             min-height: 100vh;
         }
         .navbar {
-            background: rgba(20, 22, 28, 0.9);
-            backdrop-filter: blur(12px);
+            background: rgba(20, 22, 28, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 28px;
+            padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -25,58 +24,71 @@
             top: 0;
             z-index: 50;
         }
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .nav-left a {
-            color: #8b90a0;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-        }
+        .nav-left { display: flex; align-items: center; gap: 14px; }
+        .nav-left a { color: #8b90a0; text-decoration: none; font-size: 13px; }
         .nav-left a:hover { color: #e8eaed; }
-        .nav-left h1 {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .user-info img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-        }
+        .nav-left h1 { font-size: 16px; font-weight: 600; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-info img { width: 32px; height: 32px; border-radius: 50%; }
         .user-info span { font-size: 13px; color: #c5c8d0; }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            text-decoration: none; border: none; cursor: pointer; font-family: inherit;
+            transition: 0.15s;
         }
         .btn-primary { background: #5865F2; color: #fff; }
         .btn-primary:hover { background: #4752c4; }
         .btn-danger {
-            background: rgba(237,66,69,0.15);
-            color: #ff6b6e;
+            background: rgba(237,66,69,0.15); color: #ff6b6e;
             border: 1px solid rgba(237,66,69,0.25);
         }
-        .container {
-            max-width: 720px;
+        .layout {
+            display: flex;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 28px 20px 60px;
+            min-height: calc(100vh - 62px);
+        }
+        .sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            padding: 24px 14px;
+            background: #12151b;
+        }
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7080;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0 10px 12px;
+        }
+        .side-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            color: #b5bac1;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: 0.15s;
+        }
+        .side-item:hover { background: rgba(255,255,255,0.04); color: #e8eaed; }
+        .side-item.active {
+            background: rgba(88,101,242,0.15);
+            color: #c4cafc;
+        }
+        .content {
+            flex: 1;
+            padding: 28px 28px 60px;
+            min-width: 0;
         }
         .flash {
             background: rgba(35,165,89,0.15);
@@ -88,38 +100,36 @@
             font-size: 13px;
             font-weight: 500;
         }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+        .panel-desc {
+            color: #8b90a0;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
         .section {
             background: #171a21;
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 14px;
-            padding: 20px 22px;
-            margin-bottom: 16px;
-        }
-        .section h2 {
-            font-size: 13px;
-            font-weight: 600;
-            color: #8b90a0;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 20px;
         }
         .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 14px 0;
             gap: 16px;
         }
         .setting-row + .setting-row {
             border-top: 1px solid rgba(255,255,255,0.04);
         }
-        .setting-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: #dbdee1;
-        }
+        .setting-label { font-size: 14px; font-weight: 500; color: #dbdee1; }
         select, input[type="text"] {
             background: #0f1115;
             border: 1px solid rgba(255,255,255,0.08);
@@ -130,52 +140,35 @@
             font-family: inherit;
             min-width: 200px;
         }
-        select:focus, input:focus {
-            outline: none;
-            border-color: #5865F2;
-        }
+        select:focus, input:focus { outline: none; border-color: #5865F2; }
         .badge-on, .badge-off {
-            border: none;
-            cursor: pointer;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            font-family: inherit;
+            border: none; cursor: pointer; padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; font-family: inherit;
         }
-        .badge-on {
-            background: rgba(35,165,89,0.2);
-            color: #3dd68c;
-        }
-        .badge-off {
-            background: rgba(255,255,255,0.06);
-            color: #8b90a0;
-        }
-        .kufur-form {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
+        .badge-on { background: rgba(35,165,89,0.2); color: #3dd68c; }
+        .badge-off { background: rgba(255,255,255,0.06); color: #8b90a0; }
+        .kufur-form { display: flex; gap: 8px; margin-bottom: 14px; padding-top: 8px; }
         .kufur-form input { flex: 1; min-width: 0; }
-        .kufur-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
+        .kufur-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
         .kufur-tag {
-            background: rgba(255,255,255,0.06);
-            color: #c5c8d0;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
+            background: rgba(255,255,255,0.06); color: #c5c8d0; border: none;
+            padding: 6px 10px; border-radius: 8px; font-size: 12px; cursor: pointer;
             font-family: inherit;
         }
-        .kufur-tag:hover {
-            background: rgba(237,66,69,0.2);
-            color: #ff6b6e;
+        .kufur-tag:hover { background: rgba(237,66,69,0.2); color: #ff6b6e; }
+        @media (max-width: 800px) {
+            .layout { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 14px;
+            }
+            .sidebar-title { width: 100%; }
+            .side-item { width: auto; }
         }
     </style>
 </head>
@@ -194,185 +187,239 @@
         </div>
     </nav>
 
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="flash">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-title">Kategoriler</div>
+            <button type="button" class="side-item active" data-panel="roller">Genel Roller</button>
+            <button type="button" class="side-item" data-panel="kanallar">Kanallar</button>
+            <button type="button" class="side-item" data-panel="guard">Guard (Koruma)</button>
+            <button type="button" class="side-item" data-panel="nick">Nick Sistemi</button>
+            <button type="button" class="side-item" data-panel="seviye">📊 Seviye Sistemi</button>
+            <button type="button" class="side-item" data-panel="dogumgunu">🎂 Doğum Günü</button>
+            <button type="button" class="side-item" data-panel="kufur">Küfür Filtresi</button>
+        </aside>
 
-        <div class="section">
-            <h2>Genel Roller</h2>
-            {% set role_settings = [
-                ('ust_yetkili_rol', 'Üst Yetkili Rol'),
-                ('yetkili_rol', 'Yetkili Rol'),
-                ('oto_rol', 'Oto Rol'),
-                ('kayitsiz_rol', 'Kayıtsız Rol'),
-                ('aile_rol', 'Aile Rol'),
-                ('jail_rol', 'Jail Rol')
-            ] %}
-            {% for key, label in role_settings %}
-            <div class="setting-row">
-                <span class="setting-label">{{ label }}</span>
-                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
-                    <input type="hidden" name="key" value="{{ key }}">
-                    <select name="value">
-                        <option value="">— Seçilmedi —</option>
-                        {% for role in roles %}
-                        <option value="{{ role.id }}" {% if settings.get(key)|string == role.id|string %}selected{% endif %}>
-                            {{ role.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-primary">Kaydet</button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="flash">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        <div class="section">
-            <h2>Kanallar</h2>
-            {% set channel_settings = [
-                ('log_kanali', 'Moderasyon Log'),
-                ('ticket_log_kanali', 'Ticket Log'),
-                ('kurallar_kanali', 'Kurallar Kanalı'),
-                ('hosgeldin_kanali', 'Hoş Geldin Kanalı'),
-                ('tuzak_kanali', 'Bot Tuzağı Kanalı')
-            ] %}
-            {% for key, label in channel_settings %}
-            <div class="setting-row">
-                <span class="setting-label">{{ label }}</span>
-                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
-                    <input type="hidden" name="key" value="{{ key }}">
-                    <select name="value">
-                        <option value="">— Seçilmedi —</option>
-                        {% for channel in channels %}
-                        <option value="{{ channel.id }}" {% if settings.get(key)|string == channel.id|string %}selected{% endif %}>
-                            #{{ channel.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-primary">Kaydet</button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="section">
-            <h2>Guard (Koruma)</h2>
-            {% set guards = [
-                ('guard_kanal', 'Kanal Koruması'),
-                ('guard_rol', 'Rol Koruması'),
-                ('guard_bot', 'Bot Koruması'),
-                ('guard_webhook', 'Webhook Koruması'),
-                ('guard_rightclick', 'Sağ Tık Ban/Kick')
-            ] %}
-            {% for key, label in guards %}
-            <div class="setting-row">
-                <span class="setting-label">{{ label }}</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}">
-                    <button type="submit" class="{{ 'badge-on' if settings.get(key) else 'badge-off' }}">
-                        {{ 'Açık' if settings.get(key) else 'Kapalı' }}
-                    </button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="section">
-            <h2>Nick Sistemi</h2>
-            <div class="setting-row">
-                <span class="setting-label">İsim | Yaş Nick</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/oto_nick">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}">
-                        {{ 'Açık' if settings.get('oto_nick') else 'Kapalı' }}
-                    </button>
-                </form>
-            </div>
-        </div>
-
+            <!-- GENEL ROLLER -->
+            <div class="panel active" id="panel-roller">
+                <div class="panel-title">Genel Roller</div>
+                <p class="panel-desc">Yetkili, oto rol, jail ve diğer temel roller.</p>
                 <div class="section">
-            <h2>📊 Seviye Sistemi</h2>
-            <div class="setting-row">
-                <span class="setting-label">Seviye / XP Sistemi</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/seviye_sistemi">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('seviye_sistemi', True) else 'badge-off' }}">
-                        {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
-                    </button>
-                </form>
+                    {% set role_settings = [
+                        ('ust_yetkili_rol', 'Üst Yetkili Rol'),
+                        ('yetkili_rol', 'Yetkili Rol'),
+                        ('oto_rol', 'Oto Rol'),
+                        ('kayitsiz_rol', 'Kayıtsız Rol'),
+                        ('aile_rol', 'Aile Rol'),
+                        ('jail_rol', 'Jail Rol')
+                    ] %}
+                    {% for key, label in role_settings %}
+                    <div class="setting-row">
+                        <span class="setting-label">{{ label }}</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                            <input type="hidden" name="key" value="{{ key }}">
+                            <select name="value">
+                                <option value="">— Seçilmedi —</option>
+                                {% for role in roles %}
+                                <option value="{{ role.id }}" {% if settings.get(key)|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
 
-                <!-- Doğum Günü Sistemi -->
-        <div class="section">
-            <h2>🎂 Doğum Günü Sistemi</h2>
-
-            <div class="setting-row">
-                <span class="setting-label">Doğum Günü Sistemi</span>
-                <form method="POST" action="/guild/{{ guild.id }}/toggle/dogum_gunu_sistemi">
-                    <button type="submit" class="{{ 'badge-on' if settings.get('dogum_gunu_sistemi') else 'badge-off' }}">
-                        {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
-                    </button>
-                </form>
+            <!-- KANALLAR -->
+            <div class="panel" id="panel-kanallar">
+                <div class="panel-title">Kanallar</div>
+                <p class="panel-desc">Log, hoş geldin ve diğer kanal ayarları.</p>
+                <div class="section">
+                    {% set channel_settings = [
+                        ('log_kanali', 'Moderasyon Log'),
+                        ('ticket_log_kanali', 'Ticket Log'),
+                        ('kurallar_kanali', 'Kurallar Kanalı'),
+                        ('hosgeldin_kanali', 'Hoş Geldin Kanalı'),
+                        ('tuzak_kanali', 'Bot Tuzağı Kanalı')
+                    ] %}
+                    {% for key, label in channel_settings %}
+                    <div class="setting-row">
+                        <span class="setting-label">{{ label }}</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                            <input type="hidden" name="key" value="{{ key }}">
+                            <select name="value">
+                                <option value="">— Seçilmedi —</option>
+                                {% for channel in channels %}
+                                <option value="{{ channel.id }}" {% if settings.get(key)|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
 
-            <div class="setting-row">
-                <span class="setting-label">Doğum Günü Rolü</span>
-                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
-                    <input type="hidden" name="key" value="dogum_gunu_rol">
-                    <select name="value">
-                        <option value="">— Seçilmedi —</option>
-                        {% for role in roles %}
-                        <option value="{{ role.id }}" {% if settings.get('dogum_gunu_rol')|string == role.id|string %}selected{% endif %}>
-                            {{ role.name }}
-                        </option>
+            <!-- GUARD -->
+            <div class="panel" id="panel-guard">
+                <div class="panel-title">Guard (Koruma)</div>
+                <p class="panel-desc">İzinsiz işlemleri engelleyen koruma modülleri.</p>
+                <div class="section">
+                    {% set guards = [
+                        ('guard_kanal', 'Kanal Koruması'),
+                        ('guard_rol', 'Rol Koruması'),
+                        ('guard_bot', 'Bot Koruması'),
+                        ('guard_webhook', 'Webhook Koruması'),
+                        ('guard_rightclick', 'Sağ Tık Ban/Kick')
+                    ] %}
+                    {% for key, label in guards %}
+                    <div class="setting-row">
+                        <span class="setting-label">{{ label }}</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}">
+                            <button type="submit" class="{{ 'badge-on' if settings.get(key) else 'badge-off' }}">
+                                {{ 'Açık' if settings.get(key) else 'Kapalı' }}
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- NICK -->
+            <div class="panel" id="panel-nick">
+                <div class="panel-title">Nick Sistemi</div>
+                <p class="panel-desc">İsim | Yaş formatında takma ad sistemi.</p>
+                <div class="section">
+                    <div class="setting-row">
+                        <span class="setting-label">İsim | Yaş Nick</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/oto_nick">
+                            <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}">
+                                {{ 'Açık' if settings.get('oto_nick') else 'Kapalı' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEVİYE -->
+            <div class="panel" id="panel-seviye">
+                <div class="panel-title">📊 Seviye Sistemi</div>
+                <p class="panel-desc">Mesajlardan XP ve seviye atlama.</p>
+                <div class="section">
+                    <div class="setting-row">
+                        <span class="setting-label">Seviye / XP Sistemi</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/seviye_sistemi">
+                            <button type="submit" class="{{ 'badge-on' if settings.get('seviye_sistemi', True) else 'badge-off' }}">
+                                {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOĞUM GÜNÜ -->
+            <div class="panel" id="panel-dogumgunu">
+                <div class="panel-title">🎂 Doğum Günü Sistemi</div>
+                <p class="panel-desc">Doğum gününde rol ve duyuru ayarları.</p>
+                <div class="section">
+                    <div class="setting-row">
+                        <span class="setting-label">Doğum Günü Sistemi</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/dogum_gunu_sistemi">
+                            <button type="submit" class="{{ 'badge-on' if settings.get('dogum_gunu_sistemi') else 'badge-off' }}">
+                                {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
+                            </button>
+                        </form>
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">Doğum Günü Rolü</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                            <input type="hidden" name="key" value="dogum_gunu_rol">
+                            <select name="value">
+                                <option value="">— Seçilmedi —</option>
+                                {% for role in roles %}
+                                <option value="{{ role.id }}" {% if settings.get('dogum_gunu_rol')|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </form>
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">Duyuru Kanalı</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                            <input type="hidden" name="key" value="dogum_gunu_kanali">
+                            <select name="value">
+                                <option value="">— Seçilmedi —</option>
+                                {% for channel in channels %}
+                                <option value="{{ channel.id }}" {% if settings.get('dogum_gunu_kanali')|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KÜFÜR -->
+            <div class="panel" id="panel-kufur">
+                <div class="panel-title">Küfür Filtresi</div>
+                <p class="panel-desc">Engellenecek kelimeleri yönet.</p>
+                <div class="section" style="padding: 16px 20px;">
+                    <form method="POST" action="/guild/{{ guild.id }}/kufur" class="kufur-form">
+                        <input type="hidden" name="action" value="ekle">
+                        <input type="text" name="kelime" placeholder="Eklenecek kelime">
+                        <button type="submit" class="btn btn-primary">Ekle</button>
+                    </form>
+                    <div class="kufur-tags">
+                        {% set kufur_listesi = settings.get('kufur_listesi', ['amk', 'aq', 'orospu', 'piç', 'sik', 'yarrak', 'ibne', 'göt']) %}
+                        {% for kelime in kufur_listesi %}
+                        <form method="POST" action="/guild/{{ guild.id }}/kufur" style="display:inline;">
+                            <input type="hidden" name="action" value="sil">
+                            <input type="hidden" name="kelime" value="{{ kelime }}">
+                            <button type="submit" class="kufur-tag">{{ kelime }} ×</button>
+                        </form>
                         {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-primary">Kaydet</button>
-                </form>
+                    </div>
+                    <form method="POST" action="/guild/{{ guild.id }}/kufur">
+                        <input type="hidden" name="action" value="sifirla">
+                        <button type="submit" class="btn btn-danger">Listeyi Varsayılana Sıfırla</button>
+                    </form>
+                </div>
             </div>
-
-            <div class="setting-row">
-                <span class="setting-label">Duyuru Kanalı</span>
-                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
-                    <input type="hidden" name="key" value="dogum_gunu_kanali">
-                    <select name="value">
-                        <option value="">— Seçilmedi —</option>
-                        {% for channel in channels %}
-                        <option value="{{ channel.id }}" {% if settings.get('dogum_gunu_kanali')|string == channel.id|string %}selected{% endif %}>
-                            #{{ channel.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-primary">Kaydet</button>
-                </form>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h2>Küfür Filtresi</h2>
-            <form method="POST" action="/guild/{{ guild.id }}/kufur" class="kufur-form">
-                <input type="hidden" name="action" value="ekle">
-                <input type="text" name="kelime" placeholder="Eklenecek kelime">
-                <button type="submit" class="btn btn-primary">Ekle</button>
-            </form>
-            <div class="kufur-tags">
-                {% set kufur_listesi = settings.get('kufur_listesi', ['amk', 'aq', 'orospu', 'piç', 'sik', 'yarrak', 'ibne', 'göt']) %}
-                {% for kelime in kufur_listesi %}
-                <form method="POST" action="/guild/{{ guild.id }}/kufur" style="display:inline;">
-                    <input type="hidden" name="action" value="sil">
-                    <input type="hidden" name="kelime" value="{{ kelime }}">
-                    <button type="submit" class="kufur-tag">{{ kelime }} ×</button>
-                </form>
-                {% endfor %}
-            </div>
-            <form method="POST" action="/guild/{{ guild.id }}/kufur">
-                <input type="hidden" name="action" value="sifirla">
-                <button type="submit" class="btn btn-danger">Listeyi Varsayılana Sıfırla</button>
-            </form>
-        </div>
+        </main>
     </div>
+
+    <script>
+        const items = document.querySelectorAll('.side-item');
+        const panels = document.querySelectorAll('.panel');
+
+        function showPanel(id) {
+            items.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.panel === id);
+            });
+            panels.forEach(panel => {
+                panel.classList.toggle('active', panel.id === 'panel-' + id);
+            });
+            localStorage.setItem('ravex_settings_panel', id);
+        }
+
+        items.forEach(btn => {
+            btn.addEventListener('click', () => showPanel(btn.dataset.panel));
+        });
+
+        // Kaydet sonrası aynı sekmede kalsın
+        const saved = localStorage.getItem('ravex_settings_panel');
+        if (saved && document.getElementById('panel-' + saved)) {
+            showPanel(saved);
+        }
+    </script>
 </body>
 </html>
