@@ -55,16 +55,12 @@
             border-right: 1px solid rgba(255,255,255,0.06);
             padding: 24px 14px;
             background: #12151b;
-            transition: width 0.2s ease, padding 0.2s ease;
+            transition: width 0.25s ease, padding 0.25s ease;
             overflow: hidden;
         }
         .sidebar.collapsed {
             width: 56px;
             padding: 16px 8px;
-        }
-        .sidebar.collapsed .sidebar-title,
-        .sidebar.collapsed .side-item-text {
-            display: none;
         }
         .sidebar-toggle {
             width: 100%;
@@ -91,6 +87,9 @@
             text-transform: uppercase;
             letter-spacing: 0.06em;
             padding: 0 10px 12px;
+            max-height: 40px;
+            overflow: hidden;
+            transition: opacity 0.2s ease, transform 0.2s ease, max-height 0.2s ease, margin 0.2s ease, padding 0.2s ease;
         }
         .side-item {
             display: flex;
@@ -108,12 +107,32 @@
             border-radius: 8px;
             cursor: pointer;
             margin-bottom: 4px;
-            transition: 0.15s;
+            max-height: 48px;
+            overflow: hidden;
+            transition:
+                background 0.15s,
+                color 0.15s,
+                opacity 0.22s ease,
+                transform 0.22s ease,
+                max-height 0.22s ease,
+                margin 0.22s ease,
+                padding 0.22s ease;
         }
         .side-item:hover { background: rgba(255,255,255,0.04); color: #e8eaed; }
         .side-item.active {
             background: rgba(88,101,242,0.15);
             color: #c4cafc;
+        }
+        /* Kapalıyken başlık + emojiler + yazılar yukarı kayıp kaybolur */
+        .sidebar.collapsed .sidebar-title,
+        .sidebar.collapsed .side-item {
+            opacity: 0;
+            transform: translateY(-12px);
+            max-height: 0;
+            margin: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            pointer-events: none;
         }
         .content {
             flex: 1;
@@ -250,7 +269,6 @@
                 {% endif %}
             {% endwith %}
 
-            <!-- GENEL ROLLER -->
             <div class="panel active" id="panel-roller">
                 <div class="panel-title">Genel Roller</div>
                 <p class="panel-desc">Yetkili, oto rol, jail ve diğer temel roller.</p>
@@ -281,7 +299,6 @@
                 </div>
             </div>
 
-            <!-- KANALLAR -->
             <div class="panel" id="panel-kanallar">
                 <div class="panel-title">Kanallar</div>
                 <p class="panel-desc">Log, hoş geldin ve diğer kanal ayarları.</p>
@@ -311,7 +328,6 @@
                 </div>
             </div>
 
-            <!-- GUARD -->
             <div class="panel" id="panel-guard">
                 <div class="panel-title">Guard (Koruma)</div>
                 <p class="panel-desc">İzinsiz işlemleri engelleyen koruma modülleri.</p>
@@ -336,7 +352,6 @@
                 </div>
             </div>
 
-            <!-- NICK -->
             <div class="panel" id="panel-nick">
                 <div class="panel-title">Nick Sistemi</div>
                 <p class="panel-desc">İsim | Yaş formatında takma ad sistemi.</p>
@@ -352,7 +367,6 @@
                 </div>
             </div>
 
-            <!-- SEVİYE -->
             <div class="panel" id="panel-seviye">
                 <div class="panel-title">📊 Seviye Sistemi</div>
                 <p class="panel-desc">Mesajlardan XP ve seviye atlama.</p>
@@ -368,7 +382,6 @@
                 </div>
             </div>
 
-            <!-- DOĞUM GÜNÜ -->
             <div class="panel" id="panel-dogumgunu">
                 <div class="panel-title">🎂 Doğum Günü Sistemi</div>
                 <p class="panel-desc">Doğum gününde rol ve duyuru ayarları.</p>
@@ -410,7 +423,6 @@
                 </div>
             </div>
 
-            <!-- KÜFÜR -->
             <div class="panel" id="panel-kufur">
                 <div class="panel-title">Küfür Filtresi</div>
                 <p class="panel-desc">Engellenecek kelimeleri yönet.</p>
