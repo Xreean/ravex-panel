@@ -275,8 +275,9 @@ def toggle_setting(guild_id, key):
 
     allowed_keys = [
         "guard_kanal", "guard_rol", "guard_bot",
-        "guard_webhook", "guard_rightclick", "oto_nick"
-    ]
+        "guard_webhook", "guard_rightclick", "oto_nick",
+        "seviye_sistemi"
+]
     if key not in allowed_keys:
         return "Geçersiz ayar.", 400
 
