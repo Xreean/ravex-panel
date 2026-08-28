@@ -304,6 +304,52 @@
                 </form>
             </div>
         </div>
+
+                <!-- Doğum Günü Sistemi -->
+        <div class="section">
+            <h2>🎂 Doğum Günü Sistemi</h2>
+
+            <div class="setting-row">
+                <span class="setting-label">Doğum Günü Sistemi</span>
+                <form method="POST" action="/guild/{{ guild.id }}/toggle/dogum_gunu_sistemi">
+                    <button type="submit" class="{{ 'badge-on' if settings.get('dogum_gunu_sistemi') else 'badge-off' }}">
+                        {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
+                    </button>
+                </form>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">Doğum Günü Rolü</span>
+                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                    <input type="hidden" name="key" value="dogum_gunu_rol">
+                    <select name="value">
+                        <option value="">— Seçilmedi —</option>
+                        {% for role in roles %}
+                        <option value="{{ role.id }}" {% if settings.get('dogum_gunu_rol')|string == role.id|string %}selected{% endif %}>
+                            {{ role.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </form>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">Duyuru Kanalı</span>
+                <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                    <input type="hidden" name="key" value="dogum_gunu_kanali">
+                    <select name="value">
+                        <option value="">— Seçilmedi —</option>
+                        {% for channel in channels %}
+                        <option value="{{ channel.id }}" {% if settings.get('dogum_gunu_kanali')|string == channel.id|string %}selected{% endif %}>
+                            #{{ channel.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </form>
+            </div>
+        </div>
         
         <div class="section">
             <h2>Küfür Filtresi</h2>
