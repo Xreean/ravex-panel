@@ -276,7 +276,7 @@ def toggle_setting(guild_id, key):
     allowed_keys = [
         "guard_kanal", "guard_rol", "guard_bot",
         "guard_webhook", "guard_rightclick", "oto_nick",
-        "seviye_sistemi"
+        "seviye_sistemi", "dogum_gunu_sistemi"
 ]
     if key not in allowed_keys:
         return "Geçersiz ayar.", 400
@@ -306,7 +306,8 @@ def update_setting(guild_id):
         "ust_yetkili_rol", "yetkili_rol", "oto_rol",
         "kayitsiz_rol", "aile_rol", "jail_rol",
         "log_kanali", "ticket_log_kanali",
-        "kurallar_kanali", "hosgeldin_kanali", "tuzak_kanali"
+        "kurallar_kanali", "hosgeldin_kanali", "tuzak_kanali", "dogum_gunu_rol",
+        "dogum_gunu_kanali"
     ]
     if key not in allowed_keys:
         return "Geçersiz ayar.", 400
