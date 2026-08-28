@@ -248,7 +248,9 @@
 {% if user %}
     <nav class="navbar">
         <div class="brand">
-            <div class="brand-badge">R</div>
+            <div class="brand-badge">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Ravex" style="width:100%; height:100%; object-fit:contain;">
+</div>
             Ravex Panel
         </div>
         <div class="user-info">
@@ -329,7 +331,9 @@
 {% else %}
     <div class="login-wrap">
         <div class="login-card">
-            <div class="logo">R</div>
+            <div class="logo">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Ravex" style="width:100%; height:100%; object-fit:contain;">
+</div>
             <h1>Ravex Panel</h1>
             <p>Sunucu ayarlarını yönetmek için Discord hesabınla giriş yap.</p>
             <a class="btn btn-primary" href="/login">Discord ile Giriş Yap</a>
