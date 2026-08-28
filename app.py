@@ -145,9 +145,22 @@ def get_guild_channels(guild_id):
 @app.route("/")
 def index():
     user = session.get("user")
+    if not user:
+        return render_template("index.html", user=None, guilds=[], guilds_without_bot=[], client_id=os.getenv("DISCORD_CLIENT_ID"))
+
+    # Her seferinde güncel sunucu listesini çek
+    try:
+        token = discord.token
+        if not token:
+            # session'da token yoksa yeniden giriş
+            return redirect("/login")
+    except Exception:
+        pass
+
     guilds = session.get("guilds", [])
     guilds_without_bot = session.get("guilds_without_bot", [])
     client_id = os.getenv("DISCORD_CLIENT_ID")
+
     return render_template(
         "index.html",
         user=user,
