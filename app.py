@@ -146,34 +146,14 @@ def get_guild_channels(guild_id):
 def index():
     user = session.get("user")
     client_id = os.getenv("DISCORD_CLIENT_ID")
-
-    if not user:
-        return render_template(
-            "index.html",
-            user=None,
-            guilds=[],
-            guilds_without_bot=[],
-            client_id=client_id
-        )
-
-    # Her girişte güncel listeyi çek
-    try:
-        guilds_resp = discord.get("users/@me/guilds")
-        user_guilds = guilds_resp.json()
-        bot_guild_ids = get_bot_guilds()
-        with_bot, without_bot = get_user_guilds_split(user_guilds, bot_guild_ids)
-        session["guilds"] = with_bot
-        session["guilds_without_bot"] = without_bot
-    except Exception as e:
-        print(f"Sunucu listesi yenilenemedi: {e}")
-        with_bot = session.get("guilds", [])
-        without_bot = session.get("guilds_without_bot", [])
+    guilds = session.get("guilds", [])
+    guilds_without_bot = session.get("guilds_without_bot", [])
 
     return render_template(
         "index.html",
         user=user,
-        guilds=with_bot,
-        guilds_without_bot=without_bot,
+        guilds=guilds,
+        guilds_without_bot=guilds_without_bot,
         client_id=client_id
     )
 
