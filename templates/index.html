@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ravex Panel</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#5865F2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -70,7 +75,6 @@
         }
         .hero h2 span { color: var(--accent); }
         .hero p { color: #8b90a0; font-size: 14px; }
-
         .bot-status {
             display: inline-flex;
             align-items: center;
@@ -81,9 +85,7 @@
             font-size: 12px;
             font-weight: 600;
         }
-        .bot-status .dot {
-            width: 8px; height: 8px; border-radius: 50%;
-        }
+        .bot-status .dot { width: 8px; height: 8px; border-radius: 50%; }
         .bot-status.online {
             background: rgba(35,165,89,0.15);
             color: #3dd68c;
@@ -99,7 +101,6 @@
             border: 1px solid rgba(237,66,69,0.28);
         }
         .bot-status.offline .dot { background: #ff6b6e; }
-
         .section { margin-bottom: 36px; }
         .section-header {
             display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;
@@ -155,7 +156,6 @@
         }
         .empty-icon { font-size: 32px; margin-bottom: 10px; }
         .empty p { font-size: 14px; line-height: 1.5; }
-
         .theme-bar { display: flex; gap: 8px; align-items: center; }
         .theme-dot {
             width: 18px; height: 18px; border-radius: 50%;
@@ -170,7 +170,6 @@
         .theme-dot[data-theme="purple"] { background: #5865F2; }
         .theme-dot[data-theme="blue"] { background: #3b82f6; }
         .theme-dot[data-theme="green"] { background: #22c55e; }
-
         .login-wrap {
             min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
@@ -221,7 +220,6 @@
         .login-card h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
         .login-card p { color: #8b90a0; font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
         .login-card .btn-primary { width: 100%; padding: 12px; }
-
         @media (max-width: 600px) {
             .container { padding: 24px 14px 40px; }
             .hero h2 { font-size: 22px; }
@@ -373,6 +371,12 @@
         d.addEventListener('click', () => applyTheme(d.dataset.theme));
     });
     applyTheme(localStorage.getItem('ravex_theme') || 'purple');
+
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("/static/sw.js").catch(() => {});
+        });
+    }
 </script>
 </body>
 </html>
