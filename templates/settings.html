@@ -7,6 +7,12 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent: #5865F2;
+            --accent-2: #7b5cff;
+            --accent-soft: rgba(88,101,242,0.15);
+            --accent-border: rgba(88,101,242,0.35);
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
@@ -28,32 +34,15 @@
             z-index: 50;
             backdrop-filter: blur(12px);
         }
-        .nav-left { display: flex; align-items: center; gap: 14px; }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
         .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: #e8eaed;
-            font-weight: 700;
-            font-size: 15px;
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none; color: #e8eaed;
+            font-weight: 700; font-size: 15px;
         }
-        .nav-brand img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-        }
-        .nav-sep {
-            width: 1px;
-            height: 20px;
-            background: rgba(255,255,255,0.1);
-        }
-        .nav-back {
-            color: #8b90a0;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-        }
+        .nav-brand img { width: 28px; height: 28px; object-fit: contain; }
+        .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); }
+        .nav-back { color: #8b90a0; text-decoration: none; font-size: 13px; font-weight: 500; }
         .nav-back:hover { color: #e8eaed; }
         .user-info { display: flex; align-items: center; gap: 12px; }
         .user-info img { width: 32px; height: 32px; border-radius: 50%; }
@@ -64,13 +53,21 @@
             text-decoration: none; border: none; cursor: pointer; font-family: inherit;
             transition: 0.15s;
         }
-        .btn-primary { background: #5865F2; color: #fff; }
-        .btn-primary:hover { background: #4752c4; transform: translateY(-1px); }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
         .btn-danger {
             background: rgba(237,66,69,0.15); color: #ff6b6e;
             border: 1px solid rgba(237,66,69,0.25);
         }
-        .btn-danger:hover { background: rgba(237,66,69,0.25); }
+        .theme-bar { display: flex; gap: 8px; align-items: center; }
+        .theme-dot {
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 2px solid transparent; cursor: pointer;
+        }
+        .theme-dot.active { border-color: #fff; }
+        .theme-dot[data-theme="purple"] { background: #5865F2; }
+        .theme-dot[data-theme="blue"] { background: #3b82f6; }
+        .theme-dot[data-theme="green"] { background: #22c55e; }
 
         /* LAYOUT */
         .layout {
@@ -107,37 +104,21 @@
         }
         .sidebar-toggle:hover { background: rgba(255,255,255,0.08); color: #fff; }
         .sidebar-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: #6b7080;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 0 10px 12px;
-            max-height: 40px;
-            overflow: hidden;
+            font-size: 11px; font-weight: 600; color: #6b7080;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 0 10px 12px; max-height: 40px; overflow: hidden;
             transition: opacity 0.2s ease, transform 0.2s ease, max-height 0.2s ease, margin 0.2s ease, padding 0.2s ease;
         }
         .side-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            text-align: left;
-            background: transparent;
-            border: none;
+            display: flex; align-items: center; gap: 10px;
+            width: 100%; text-align: left;
+            background: transparent; border: none;
             border-left: 3px solid transparent;
-            color: #b5bac1;
-            font-size: 13px;
-            font-weight: 500;
-            font-family: inherit;
-            padding: 10px 12px;
-            border-radius: 0 8px 8px 0;
-            cursor: pointer;
-            margin-bottom: 4px;
-            max-height: 48px;
-            overflow: hidden;
-            transition:
-                background 0.18s, color 0.18s, border-color 0.18s,
+            color: #b5bac1; font-size: 13px; font-weight: 500;
+            font-family: inherit; padding: 10px 12px;
+            border-radius: 0 8px 8px 0; cursor: pointer;
+            margin-bottom: 4px; max-height: 48px; overflow: hidden;
+            transition: background 0.18s, color 0.18s, border-color 0.18s,
                 opacity 0.22s ease, transform 0.22s ease,
                 max-height 0.22s ease, margin 0.22s ease, padding 0.22s ease;
         }
@@ -147,67 +128,68 @@
             transform: translateX(2px);
         }
         .side-item.active {
-            background: rgba(88,101,242,0.14);
+            background: var(--accent-soft);
             color: #c4cafc;
-            border-left-color: #5865F2;
+            border-left-color: var(--accent);
+        }
+        .side-item kbd {
+            margin-left: auto;
+            font-size: 10px;
+            color: #5c6370;
+            background: rgba(255,255,255,0.04);
+            padding: 2px 5px;
+            border-radius: 4px;
         }
         .sidebar.collapsed .sidebar-title,
         .sidebar.collapsed .side-item {
-            opacity: 0;
-            transform: translateY(-12px);
-            max-height: 0;
-            margin: 0;
-            padding-top: 0;
-            padding-bottom: 0;
+            opacity: 0; transform: translateY(-12px);
+            max-height: 0; margin: 0; padding-top: 0; padding-bottom: 0;
             pointer-events: none;
         }
 
         /* CONTENT */
         .content { flex: 1; padding: 28px 28px 60px; min-width: 0; }
 
-        /* SUNUCU BAŞLIĞI */
         .guild-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 20px; padding-bottom: 18px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .guild-header-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #5865F2, #7b5cff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 20px;
-            overflow: hidden;
-            flex-shrink: 0;
+            width: 52px; height: 52px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 20px; overflow: hidden; flex-shrink: 0;
         }
-        .guild-header-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .guild-header-icon img { width: 100%; height: 100%; object-fit: cover; }
         .guild-header-meta h2 {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 4px;
+            font-size: 20px; font-weight: 700;
+            letter-spacing: -0.02em; margin-bottom: 4px;
         }
         .guild-header-badge {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 600;
-            color: #a5b4fc;
-            background: rgba(88,101,242,0.15);
-            border: 1px solid rgba(88,101,242,0.25);
-            padding: 3px 8px;
-            border-radius: 6px;
+            display: inline-block; font-size: 11px; font-weight: 600;
+            color: #a5b4fc; background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
+            padding: 3px 8px; border-radius: 6px;
         }
+
+        /* ÖZET KART */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            background: #171a21;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+        .summary-card .label { font-size: 11px; color: #8b90a0; margin-bottom: 4px; }
+        .summary-card .value { font-size: 14px; font-weight: 600; }
+        .summary-card .value.on { color: #3dd68c; }
+        .summary-card .value.off { color: #8b90a0; }
 
         .panel { display: none; animation: fadeIn 0.2s ease; }
         .panel.active { display: block; }
@@ -215,13 +197,22 @@
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .panel-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            letter-spacing: -0.02em;
+        .panel-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; }
+        .panel-desc { color: #8b90a0; font-size: 13px; margin-bottom: 16px; }
+
+        .search-box {
+            width: 100%;
+            background: #0f1115;
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #e8eaed;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            margin-bottom: 12px;
         }
-        .panel-desc { color: #8b90a0; font-size: 13px; margin-bottom: 20px; }
+        .search-box:focus { outline: none; border-color: var(--accent); }
+
         .section {
             background: #171a21;
             border: 1px solid rgba(255,255,255,0.05);
@@ -235,8 +226,14 @@
             align-items: center;
             padding: 14px 0;
             gap: 16px;
+            transition: background 0.3s, box-shadow 0.3s;
+            border-radius: 8px;
         }
         .setting-row + .setting-row { border-top: 1px solid rgba(255,255,255,0.04); }
+        .setting-row.just-saved {
+            background: rgba(35,165,89,0.1);
+            box-shadow: inset 0 0 0 1px rgba(35,165,89,0.35);
+        }
         .setting-label { font-size: 14px; font-weight: 500; color: #dbdee1; }
         select, input[type="text"] {
             background: #0f1115;
@@ -248,7 +245,7 @@
             font-family: inherit;
             min-width: 200px;
         }
-        select:focus, input:focus { outline: none; border-color: #5865F2; }
+        select:focus, input:focus { outline: none; border-color: var(--accent); }
         .badge-on, .badge-off {
             border: none; cursor: pointer; padding: 7px 16px; border-radius: 20px;
             font-size: 12px; font-weight: 600; font-family: inherit;
@@ -269,27 +266,18 @@
 
         /* TOAST */
         .toast-wrap {
-            position: fixed;
-            top: 72px;
-            right: 20px;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
+            position: fixed; top: 72px; right: 20px; z-index: 100;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
         }
         .toast {
             background: #1a1d26;
             border: 1px solid rgba(35,165,89,0.4);
             color: #3dd68c;
-            padding: 12px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 12px 18px; border-radius: 10px;
+            font-size: 13px; font-weight: 600;
             box-shadow: 0 8px 28px rgba(0,0,0,0.35);
             animation: toastIn 0.3s ease, toastOut 0.3s ease 2.4s forwards;
-            pointer-events: auto;
-            min-width: 200px;
+            pointer-events: auto; min-width: 200px;
         }
         @keyframes toastIn {
             from { opacity: 0; transform: translateX(40px); }
@@ -299,62 +287,41 @@
             to { opacity: 0; transform: translateX(40px); }
         }
 
-        /* MOBİL */
         .mobile-menu-btn {
             display: none;
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.08);
-            color: #e8eaed;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 16px;
-            cursor: pointer;
-            font-family: inherit;
+            color: #e8eaed; border-radius: 8px;
+            padding: 8px 12px; font-size: 16px; cursor: pointer; font-family: inherit;
         }
+        .hint {
+            font-size: 11px; color: #5c6370; margin-top: 16px;
+        }
+
         @media (max-width: 800px) {
             .mobile-menu-btn { display: inline-flex; }
             .layout { flex-direction: column; }
             .sidebar {
-                width: 100%;
-                border-right: none;
+                width: 100%; border-right: none;
                 border-bottom: 1px solid rgba(255,255,255,0.06);
-                padding: 12px;
-                max-height: 0;
-                padding-top: 0;
-                padding-bottom: 0;
-                opacity: 0;
-                overflow: hidden;
+                max-height: 0; padding: 0 12px; opacity: 0; overflow: hidden;
                 transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.25s ease;
             }
-            .sidebar.mobile-open {
-                max-height: 500px;
-                padding: 12px;
-                opacity: 1;
-            }
+            .sidebar.mobile-open { max-height: 520px; padding: 12px; opacity: 1; }
             .sidebar.collapsed { width: 100%; }
             .sidebar.collapsed .sidebar-title,
             .sidebar.collapsed .side-item {
-                opacity: 1;
-                transform: none;
-                max-height: 48px;
-                pointer-events: auto;
-                padding: 10px 12px;
-                margin-bottom: 4px;
+                opacity: 1; transform: none; max-height: 48px;
+                pointer-events: auto; padding: 10px 12px; margin-bottom: 4px;
             }
             .sidebar-toggle { display: none; }
+            .side-item kbd { display: none; }
             .content { padding: 20px 16px 40px; }
-            .setting-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
+            .setting-row { flex-direction: column; align-items: flex-start; gap: 10px; }
             select, input[type="text"] { width: 100%; min-width: 0; }
-            .setting-row form {
-                width: 100%;
-                flex-wrap: wrap;
-            }
-            .guild-header { margin-bottom: 20px; }
+            .setting-row form { width: 100%; flex-wrap: wrap; }
             .toast-wrap { left: 12px; right: 12px; top: 64px; }
+            .theme-bar { display: none; }
         }
     </style>
 </head>
@@ -370,6 +337,11 @@
             <button type="button" class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
         <div class="user-info">
+            <div class="theme-bar" title="Tema rengi">
+                <span class="theme-dot" data-theme="purple"></span>
+                <span class="theme-dot" data-theme="blue"></span>
+                <span class="theme-dot" data-theme="green"></span>
+            </div>
             {% if user.avatar %}
             <img src="https://cdn.discordapp.com/avatars/{{ user.id }}/{{ user.avatar }}.png" alt="">
             {% endif %}
@@ -394,40 +366,37 @@
             <div class="sidebar-title">Kategoriler</div>
 
             <button type="button" class="side-item active" data-panel="roller">
-                <span>⚙️</span><span class="side-item-text">Genel Roller</span>
+                <span>⚙️</span><span class="side-item-text">Genel Roller</span><kbd>1</kbd>
             </button>
             <button type="button" class="side-item" data-panel="kanallar">
-                <span>📜</span><span class="side-item-text">Kanallar</span>
+                <span>📜</span><span class="side-item-text">Kanallar</span><kbd>2</kbd>
             </button>
             <button type="button" class="side-item" data-panel="guard">
-                <span>🛡️</span><span class="side-item-text">Guard (Koruma)</span>
+                <span>🛡️</span><span class="side-item-text">Guard</span><kbd>3</kbd>
             </button>
             <button type="button" class="side-item" data-panel="filtreler">
-                <span>🚫</span><span class="side-item-text">Mesaj Filtreleri</span>
+                <span>🚫</span><span class="side-item-text">Mesaj Filtreleri</span><kbd>4</kbd>
             </button>
             <button type="button" class="side-item" data-panel="nick">
-                <span>📛</span><span class="side-item-text">Nick Sistemi</span>
+                <span>📛</span><span class="side-item-text">Nick Sistemi</span><kbd>5</kbd>
             </button>
             <button type="button" class="side-item" data-panel="seviye">
-                <span>📊</span><span class="side-item-text">Seviye Sistemi</span>
+                <span>📊</span><span class="side-item-text">Seviye</span><kbd>6</kbd>
             </button>
             <button type="button" class="side-item" data-panel="dogumgunu">
-                <span>🎂</span><span class="side-item-text">Doğum Günü</span>
+                <span>🎂</span><span class="side-item-text">Doğum Günü</span><kbd>7</kbd>
             </button>
             <button type="button" class="side-item" data-panel="kufur">
-                <span>🤬</span><span class="side-item-text">Küfür Listesi</span>
+                <span>🤬</span><span class="side-item-text">Küfür Listesi</span><kbd>8</kbd>
             </button>
         </aside>
 
         <main class="content">
-            <!-- SUNUCU BAŞLIĞI -->
             <div class="guild-header">
                 <div class="guild-header-icon">
                     {% if guild.icon %}
                     <img src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" alt="">
-                    {% else %}
-                    {{ guild.name[:1] }}
-                    {% endif %}
+                    {% else %}{{ guild.name[:1] }}{% endif %}
                 </div>
                 <div class="guild-header-meta">
                     <h2>{{ guild.name }}</h2>
@@ -435,10 +404,39 @@
                 </div>
             </div>
 
-            <!-- GENEL ROLLER -->
+            <!-- ÖZET -->
+            {% set guard_keys = ['guard_kanal','guard_rol','guard_bot','guard_webhook','guard_rightclick'] %}
+            {% set guard_on = namespace(settings.get(k) for k in guard_keys if settings.get(k)) %}
+            {% set filt_keys = ['filter_kufur','filter_reklam','filter_caps','filter_spam'] %}
+            {% set filt_on = namespace(1 for k in filt_keys if settings.get(k, True)) %}
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="label">Guard</div>
+                    <div class="value {{ 'on' if guard_on else 'off' }}">{{ guard_on }}/5 açık</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Mesaj Filtreleri</div>
+                    <div class="value {{ 'on' if filt_on else 'off' }}">{{ filt_on }}/4 açık</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Seviye</div>
+                    <div class="value {{ 'on' if settings.get('seviye_sistemi', True) else 'off' }}">
+                        {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Doğum Günü</div>
+                    <div class="value {{ 'on' if settings.get('dogum_gunu_sistemi') else 'off' }}">
+                        {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROLLER -->
             <div class="panel active" id="panel-roller">
                 <div class="panel-title">Genel Roller</div>
                 <p class="panel-desc">Yetkili, oto rol, jail ve diğer temel roller.</p>
+                <input type="text" class="search-box" data-filter="role" placeholder="Rol ara...">
                 <div class="section">
                     {% set role_settings = [
                         ('ust_yetkili_rol', 'Üst Yetkili Rol'),
@@ -449,14 +447,14 @@
                         ('jail_rol', 'Jail Rol')
                     ] %}
                     {% for key, label in role_settings %}
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
                             <input type="hidden" name="key" value="{{ key }}">
-                            <select name="value">
+                            <select name="value" class="role-select">
                                 <option value="">— Seçilmedi —</option>
                                 {% for role in roles %}
-                                <option value="{{ role.id }}" {% if settings.get(key)|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
+                                <option value="{{ role.id }}" data-name="{{ role.name|lower }}" {% if settings.get(key)|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
                                 {% endfor %}
                             </select>
                             <button type="submit" class="btn btn-primary">Kaydet</button>
@@ -470,6 +468,7 @@
             <div class="panel" id="panel-kanallar">
                 <div class="panel-title">Kanallar</div>
                 <p class="panel-desc">Log, hoş geldin ve diğer kanal ayarları.</p>
+                <input type="text" class="search-box" data-filter="channel" placeholder="Kanal ara...">
                 <div class="section">
                     {% set channel_settings = [
                         ('log_kanali', 'Moderasyon Log'),
@@ -479,14 +478,14 @@
                         ('tuzak_kanali', 'Bot Tuzağı Kanalı')
                     ] %}
                     {% for key, label in channel_settings %}
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
                             <input type="hidden" name="key" value="{{ key }}">
-                            <select name="value">
+                            <select name="value" class="channel-select">
                                 <option value="">— Seçilmedi —</option>
                                 {% for channel in channels %}
-                                <option value="{{ channel.id }}" {% if settings.get(key)|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
+                                <option value="{{ channel.id }}" data-name="{{ channel.name|lower }}" {% if settings.get(key)|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
                                 {% endfor %}
                             </select>
                             <button type="submit" class="btn btn-primary">Kaydet</button>
@@ -509,9 +508,9 @@
                         ('guard_rightclick', 'Sağ Tık Ban/Kick')
                     ] %}
                     {% for key, label in guards %}
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}">
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}" data-save-key="{{ key }}">
                             <button type="submit" class="{{ 'badge-on' if settings.get(key) else 'badge-off' }}">
                                 {{ 'Açık' if settings.get(key) else 'Kapalı' }}
                             </button>
@@ -521,7 +520,7 @@
                 </div>
             </div>
 
-            <!-- MESAJ FİLTRELERİ -->
+            <!-- FİLTRELER -->
             <div class="panel" id="panel-filtreler">
                 <div class="panel-title">Mesaj Filtreleri</div>
                 <p class="panel-desc">Küfür, reklam, caps ve spam korumalarını aç / kapat.</p>
@@ -533,9 +532,9 @@
                         ('filter_spam', 'Spam Koruması')
                     ] %}
                     {% for key, label in filters %}
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}">
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}" data-save-key="{{ key }}">
                             <button type="submit" class="{{ 'badge-on' if settings.get(key, True) else 'badge-off' }}">
                                 {{ 'Açık' if settings.get(key, True) else 'Kapalı' }}
                             </button>
@@ -550,9 +549,9 @@
                 <div class="panel-title">Nick Sistemi</div>
                 <p class="panel-desc">İsim | Yaş formatında takma ad sistemi.</p>
                 <div class="section">
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="oto_nick">
                         <span class="setting-label">İsim | Yaş Nick</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/oto_nick">
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/oto_nick" data-save-key="oto_nick">
                             <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}">
                                 {{ 'Açık' if settings.get('oto_nick') else 'Kapalı' }}
                             </button>
@@ -566,9 +565,9 @@
                 <div class="panel-title">Seviye Sistemi</div>
                 <p class="panel-desc">Mesajlardan XP ve seviye atlama.</p>
                 <div class="section">
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="seviye_sistemi">
                         <span class="setting-label">Seviye / XP Sistemi</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/seviye_sistemi">
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/seviye_sistemi" data-save-key="seviye_sistemi">
                             <button type="submit" class="{{ 'badge-on' if settings.get('seviye_sistemi', True) else 'badge-off' }}">
                                 {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
                             </button>
@@ -582,35 +581,35 @@
                 <div class="panel-title">Doğum Günü Sistemi</div>
                 <p class="panel-desc">Doğum gününde rol ve duyuru ayarları.</p>
                 <div class="section">
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="dogum_gunu_sistemi">
                         <span class="setting-label">Doğum Günü Sistemi</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/dogum_gunu_sistemi">
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/dogum_gunu_sistemi" data-save-key="dogum_gunu_sistemi">
                             <button type="submit" class="{{ 'badge-on' if settings.get('dogum_gunu_sistemi') else 'badge-off' }}">
                                 {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
                             </button>
                         </form>
                     </div>
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="dogum_gunu_rol">
                         <span class="setting-label">Doğum Günü Rolü</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_rol">
                             <input type="hidden" name="key" value="dogum_gunu_rol">
-                            <select name="value">
+                            <select name="value" class="role-select">
                                 <option value="">— Seçilmedi —</option>
                                 {% for role in roles %}
-                                <option value="{{ role.id }}" {% if settings.get('dogum_gunu_rol')|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
+                                <option value="{{ role.id }}" data-name="{{ role.name|lower }}" {% if settings.get('dogum_gunu_rol')|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
                                 {% endfor %}
                             </select>
                             <button type="submit" class="btn btn-primary">Kaydet</button>
                         </form>
                     </div>
-                    <div class="setting-row">
+                    <div class="setting-row" data-key="dogum_gunu_kanali">
                         <span class="setting-label">Duyuru Kanalı</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;">
+                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_kanali">
                             <input type="hidden" name="key" value="dogum_gunu_kanali">
-                            <select name="value">
+                            <select name="value" class="channel-select">
                                 <option value="">— Seçilmedi —</option>
                                 {% for channel in channels %}
-                                <option value="{{ channel.id }}" {% if settings.get('dogum_gunu_kanali')|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
+                                <option value="{{ channel.id }}" data-name="{{ channel.name|lower }}" {% if settings.get('dogum_gunu_kanali')|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
                                 {% endfor %}
                             </select>
                             <button type="submit" class="btn btn-primary">Kaydet</button>
@@ -645,6 +644,8 @@
                     </form>
                 </div>
             </div>
+
+            <p class="hint">Kısayollar: klavyeden 1–8 ile kategoriler arası geçiş</p>
         </main>
     </div>
 
@@ -654,29 +655,19 @@
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const panelOrder = ['roller','kanallar','guard','filtreler','nick','seviye','dogumgunu','kufur'];
 
         function showPanel(id) {
-            items.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.panel === id);
-            });
-            panels.forEach(panel => {
-                panel.classList.toggle('active', panel.id === 'panel-' + id);
-            });
+            items.forEach(btn => btn.classList.toggle('active', btn.dataset.panel === id));
+            panels.forEach(panel => panel.classList.toggle('active', panel.id === 'panel-' + id));
             localStorage.setItem('ravex_settings_panel', id);
-            // Mobilde panel seçince menüyü kapat
-            if (window.innerWidth <= 800) {
-                sidebar.classList.remove('mobile-open');
-            }
+            if (window.innerWidth <= 800) sidebar.classList.remove('mobile-open');
         }
 
-        items.forEach(btn => {
-            btn.addEventListener('click', () => showPanel(btn.dataset.panel));
-        });
+        items.forEach(btn => btn.addEventListener('click', () => showPanel(btn.dataset.panel)));
 
         const saved = localStorage.getItem('ravex_settings_panel');
-        if (saved && document.getElementById('panel-' + saved)) {
-            showPanel(saved);
-        }
+        if (saved && document.getElementById('panel-' + saved)) showPanel(saved);
 
         if (localStorage.getItem('ravex_sidebar_collapsed') === '1' && window.innerWidth > 800) {
             sidebar.classList.add('collapsed');
@@ -684,17 +675,73 @@
 
         sidebarToggle.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
-            localStorage.setItem(
-                'ravex_sidebar_collapsed',
-                sidebar.classList.contains('collapsed') ? '1' : '0'
-            );
+            localStorage.setItem('ravex_sidebar_collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
         });
 
-        mobileMenuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('mobile-open');
+        mobileMenuBtn.addEventListener('click', () => sidebar.classList.toggle('mobile-open'));
+
+        // Klavye 1-8
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+            const n = parseInt(e.key, 10);
+            if (n >= 1 && n <= 8) showPanel(panelOrder[n - 1]);
         });
 
-        // Toast'ları 3 sn sonra DOM'dan temizle
+        // Tema
+        const themes = {
+            purple: { accent: '#5865F2', accent2: '#7b5cff' },
+            blue:   { accent: '#3b82f6', accent2: '#60a5fa' },
+            green:  { accent: '#22c55e', accent2: '#4ade80' }
+        };
+        function applyTheme(name) {
+            const t = themes[name] || themes.purple;
+            document.documentElement.style.setProperty('--accent', t.accent);
+            document.documentElement.style.setProperty('--accent-2', t.accent2);
+            document.querySelectorAll('.theme-dot').forEach(d => {
+                d.classList.toggle('active', d.dataset.theme === name);
+            });
+            localStorage.setItem('ravex_theme', name);
+        }
+        document.querySelectorAll('.theme-dot').forEach(d => {
+            d.addEventListener('click', () => applyTheme(d.dataset.theme));
+        });
+        applyTheme(localStorage.getItem('ravex_theme') || 'purple');
+
+        // Rol / kanal arama: option filtre
+        document.querySelectorAll('.search-box').forEach(box => {
+            box.addEventListener('input', () => {
+                const q = box.value.trim().toLowerCase();
+                const type = box.dataset.filter;
+                const selector = type === 'role' ? '.role-select' : '.channel-select';
+                const panel = box.closest('.panel');
+                panel.querySelectorAll(selector).forEach(sel => {
+                    Array.from(sel.options).forEach((opt, idx) => {
+                        if (idx === 0) { opt.hidden = false; return; }
+                        const name = (opt.dataset.name || opt.textContent || '').toLowerCase();
+                        opt.hidden = q && !name.includes(q);
+                    });
+                });
+            });
+        });
+
+        // Kaydetmeden önce hangi satır olduğunu hatırla
+        document.querySelectorAll('form[data-save-key]').forEach(form => {
+            form.addEventListener('submit', () => {
+                localStorage.setItem('ravex_last_saved_key', form.dataset.saveKey);
+            });
+        });
+
+        // Sayfa yüklenince son kaydı vurgula
+        const lastKey = localStorage.getItem('ravex_last_saved_key');
+        if (lastKey) {
+            const row = document.querySelector('.setting-row[data-key="' + lastKey + '"]');
+            if (row) {
+                row.classList.add('just-saved');
+                setTimeout(() => row.classList.remove('just-saved'), 2500);
+            }
+            localStorage.removeItem('ravex_last_saved_key');
+        }
+
         setTimeout(() => {
             document.querySelectorAll('.toast').forEach(t => t.remove());
         }, 3000);
