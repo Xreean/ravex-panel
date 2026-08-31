@@ -4,9 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ravex Panel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent: #5865F2;
+            --accent-2: #7b5cff;
+            --accent-soft: rgba(88,101,242,0.15);
+            --accent-border: rgba(88,101,242,0.35);
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
@@ -15,119 +21,51 @@
             min-height: 100vh;
         }
         .navbar {
-            background: rgba(20, 22, 28, 0.9);
-            backdrop-filter: blur(12px);
+            background: rgba(20, 22, 28, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 28px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 50;
+            backdrop-filter: blur(12px);
         }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: -0.02em;
+        .nav-brand {
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none; color: #e8eaed;
+            font-weight: 700; font-size: 15px;
         }
-        .brand-badge {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-             overflow: hidden;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .user-info img {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 2px solid rgba(88,101,242,0.4);
-        }
-        .user-info span {
-            font-size: 14px;
-            font-weight: 500;
-            color: #c5c8d0;
-        }
+        .nav-brand img { width: 28px; height: 28px; object-fit: contain; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-info img { width: 32px; height: 32px; border-radius: 50%; }
+        .user-info span { font-size: 13px; color: #c5c8d0; }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 9px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            text-decoration: none; border: none; cursor: pointer; font-family: inherit;
+            transition: 0.15s;
         }
-        .btn-primary {
-            background: #5865F2;
-            color: #fff;
-        }
-        .btn-primary:hover { background: #4752c4; transform: translateY(-1px); }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .btn-success { background: #23a559; color: #fff; }
+        .btn-success:hover { background: #1e8e4b; }
         .btn-danger {
-            background: rgba(237,66,69,0.15);
-            color: #ff6b6e;
+            background: rgba(237,66,69,0.15); color: #ff6b6e;
             border: 1px solid rgba(237,66,69,0.25);
         }
-        .btn-danger:hover { background: rgba(237,66,69,0.25); }
-        .btn-success {
-            background: #23a559;
-            color: #fff;
-        }
-        .btn-success:hover { background: #1e8e4b; transform: translateY(-1px); }
-        .container {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 36px 20px 60px;
-        }
-        .hero {
-            margin-bottom: 36px;
-        }
-        .hero h2 {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            margin-bottom: 6px;
-        }
-        .hero p {
-            color: #8b90a0;
-            font-size: 14px;
-        }
-        .section {
-            margin-bottom: 40px;
-        }
-        .section-header {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
+        .container { max-width: 980px; margin: 0 auto; padding: 36px 20px 60px; }
+        .hero { margin-bottom: 32px; }
+        .hero h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 6px; }
+        .hero p { color: #8b90a0; font-size: 14px; }
+        .section { margin-bottom: 36px; }
+        .section-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
         .section-header h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: #c5c8d0;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            font-size: 13px; font-weight: 600; color: #c5c8d0;
+            text-transform: uppercase; letter-spacing: 0.04em;
         }
-        .section-header span {
-            font-size: 12px;
-            color: #6b7080;
-        }
+        .section-header span { font-size: 12px; color: #6b7080; }
         .guild-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -143,63 +81,57 @@
             gap: 14px;
             text-decoration: none;
             color: inherit;
-            transition: all 0.18s ease;
+            transition: 0.18s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
         .guild-card:hover {
-            background: #1c2029;
-            border-color: rgba(88,101,242,0.35);
+            border-color: var(--accent-border);
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.25);
         }
         .guild-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #5865F2, #7b5cff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 18px;
-            flex-shrink: 0;
-            overflow: hidden;
+            width: 48px; height: 48px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px; overflow: hidden; flex-shrink: 0;
         }
-        .guild-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .guild-icon img { width: 100%; height: 100%; object-fit: cover; }
         .guild-meta { flex: 1; min-width: 0; }
         .guild-name {
-            font-weight: 600;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 600; font-size: 14px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .guild-badge {
-            font-size: 11px;
-            color: #8b90a0;
-            margin-top: 3px;
-        }
+        .guild-badge { font-size: 11px; color: #8b90a0; margin-top: 3px; }
         .empty {
             background: #171a21;
             border: 1px dashed rgba(255,255,255,0.08);
             border-radius: 14px;
-            padding: 28px;
+            padding: 36px 24px;
             text-align: center;
             color: #6b7080;
-            font-size: 14px;
         }
+        .empty-icon { font-size: 32px; margin-bottom: 10px; }
+        .empty p { font-size: 14px; line-height: 1.5; }
+        .theme-bar {
+            display: flex; gap: 8px; align-items: center;
+            margin-left: 8px;
+        }
+        .theme-dot {
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 2px solid transparent; cursor: pointer;
+        }
+        .theme-dot.active { border-color: #fff; }
+        .theme-dot[data-theme="purple"] { background: #5865F2; }
+        .theme-dot[data-theme="blue"] { background: #3b82f6; }
+        .theme-dot[data-theme="green"] { background: #22c55e; }
+
         .login-wrap {
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             padding: 20px;
             background:
-                radial-gradient(ellipse at 30% 20%, rgba(88,101,242,0.18), transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(123,92,255,0.12), transparent 45%),
+                radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 50%),
+                radial-gradient(ellipse at 70% 80%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 45%),
                 #0f1115;
         }
         .login-card {
@@ -213,45 +145,32 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .login-card .logo {
-            width: 72px;
-            height: 72px;
-            border-radius: 18px;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            overflow: hidden;
+            width: 72px; height: 72px; margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
         }
-        .login-card h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
-        }
-        .login-card p {
-            color: #8b90a0;
-            font-size: 14px;
-            margin-bottom: 28px;
-            line-height: 1.5;
-        }
-        .login-card .btn-primary {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
+        .login-card .logo img { width: 100%; height: 100%; object-fit: contain; }
+        .login-card h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .login-card p { color: #8b90a0; font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+        .login-card .btn-primary { width: 100%; padding: 12px; }
+        @media (max-width: 600px) {
+            .container { padding: 24px 14px 40px; }
+            .hero h2 { font-size: 22px; }
         }
     </style>
 </head>
 <body>
 {% if user %}
     <nav class="navbar">
-        <div class="brand">
-            <div class="brand-badge">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Ravex" style="width:100%; height:100%; object-fit:contain;">
-</div>
-            Ravex Panel
-        </div>
+        <a class="nav-brand" href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Ravex">
+            <span>Ravex Panel</span>
+        </a>
         <div class="user-info">
+            <div class="theme-bar" title="Tema rengi">
+                <span class="theme-dot" data-theme="purple"></span>
+                <span class="theme-dot" data-theme="blue"></span>
+                <span class="theme-dot" data-theme="green"></span>
+            </div>
             {% if user.avatar %}
             <img src="https://cdn.discordapp.com/avatars/{{ user.id }}/{{ user.avatar }}.png" alt="">
             {% endif %}
@@ -278,9 +197,7 @@
                     <div class="guild-icon">
                         {% if guild.icon %}
                         <img src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" alt="">
-                        {% else %}
-                        {{ guild.name[:1] }}
-                        {% endif %}
+                        {% else %}{{ guild.name[:1] }}{% endif %}
                     </div>
                     <div class="guild-meta">
                         <div class="guild-name">{{ guild.name }}</div>
@@ -293,7 +210,10 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty">Eklenebilecek başka sunucu yok.</div>
+            <div class="empty">
+                <div class="empty-icon">✨</div>
+                <p>Eklenebilecek başka sunucu yok.<br>Tüm yönetilebilir sunucularında bot zaten var.</p>
+            </div>
             {% endif %}
         </div>
 
@@ -309,9 +229,7 @@
                     <div class="guild-icon">
                         {% if guild.icon %}
                         <img src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" alt="">
-                        {% else %}
-                        {{ guild.name[:1] }}
-                        {% endif %}
+                        {% else %}{{ guild.name[:1] }}{% endif %}
                     </div>
                     <div class="guild-meta">
                         <div class="guild-name">{{ guild.name }}</div>
@@ -321,22 +239,45 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty">Bot henüz hiçbir sunucunda yok. Yukarıdan ekleyip sayfayı yenile.</div>
+            <div class="empty">
+                <div class="empty-icon">🤖</div>
+                <p>Bot henüz hiçbir sunucunda yok.<br>Yukarıdan bir sunucuya ekleyip sayfayı yenile.</p>
+            </div>
             {% endif %}
         </div>
     </div>
-
 {% else %}
     <div class="login-wrap">
         <div class="login-card">
             <div class="logo">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Ravex" style="width:100%; height:100%; object-fit:contain;">
-</div>
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Ravex">
+            </div>
             <h1>Ravex Panel</h1>
             <p>Sunucu ayarlarını yönetmek için Discord hesabınla giriş yap.</p>
             <a class="btn btn-primary" href="/login">Discord ile Giriş Yap</a>
         </div>
     </div>
 {% endif %}
+
+<script>
+    const themes = {
+        purple: { accent: '#5865F2', accent2: '#7b5cff' },
+        blue:   { accent: '#3b82f6', accent2: '#60a5fa' },
+        green:  { accent: '#22c55e', accent2: '#4ade80' }
+    };
+    function applyTheme(name) {
+        const t = themes[name] || themes.purple;
+        document.documentElement.style.setProperty('--accent', t.accent);
+        document.documentElement.style.setProperty('--accent-2', t.accent2);
+        document.querySelectorAll('.theme-dot').forEach(d => {
+            d.classList.toggle('active', d.dataset.theme === name);
+        });
+        localStorage.setItem('ravex_theme', name);
+    }
+    document.querySelectorAll('.theme-dot').forEach(d => {
+        d.addEventListener('click', () => applyTheme(d.dataset.theme));
+    });
+    applyTheme(localStorage.getItem('ravex_theme') || 'purple');
+</script>
 </body>
 </html>
