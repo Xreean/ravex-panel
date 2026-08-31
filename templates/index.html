@@ -12,7 +12,7 @@
             --accent-2: #7b5cff;
             --accent-soft: rgba(88,101,242,0.15);
             --accent-border: rgba(88,101,242,0.4);
-            --accent-glow: rgba(88,101,242,0.2);
+            --accent-glow: rgba(88,101,242,0.22);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -40,7 +40,10 @@
         }
         .nav-brand img { width: 28px; height: 28px; object-fit: contain; }
         .user-info { display: flex; align-items: center; gap: 12px; }
-        .user-info img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--accent-border); }
+        .user-info img {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid var(--accent-border);
+        }
         .user-info span { font-size: 13px; color: #c5c8d0; }
         .btn {
             display: inline-flex; align-items: center; justify-content: center;
@@ -49,8 +52,7 @@
             transition: 0.15s;
         }
         .btn-primary {
-            background: var(--accent);
-            color: #fff;
+            background: var(--accent); color: #fff;
             box-shadow: 0 4px 14px var(--accent-glow);
         }
         .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
@@ -68,8 +70,40 @@
         }
         .hero h2 span { color: var(--accent); }
         .hero p { color: #8b90a0; font-size: 14px; }
+
+        .bot-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .bot-status .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .bot-status.online {
+            background: rgba(35,165,89,0.15);
+            color: #3dd68c;
+            border: 1px solid rgba(35,165,89,0.3);
+        }
+        .bot-status.online .dot {
+            background: #3dd68c;
+            box-shadow: 0 0 8px #3dd68c;
+        }
+        .bot-status.offline {
+            background: rgba(237,66,69,0.12);
+            color: #ff6b6e;
+            border: 1px solid rgba(237,66,69,0.28);
+        }
+        .bot-status.offline .dot { background: #ff6b6e; }
+
         .section { margin-bottom: 36px; }
-        .section-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+        .section-header {
+            display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;
+        }
         .section-header h3 {
             font-size: 13px; font-weight: 600; color: var(--accent);
             text-transform: uppercase; letter-spacing: 0.04em;
@@ -219,6 +253,18 @@
         <div class="hero">
             <h2>Merhaba, <span>{{ user.username }}</span></h2>
             <p>Sunucularını yönet, botu ekle ve ayarları düzenle.</p>
+            {% if bot_status %}
+            <div class="bot-status {{ 'online' if bot_status.online else 'offline' }}">
+                <span class="dot"></span>
+                {% if bot_status.online %}
+                    Bot çevrimiçi
+                    {% if bot_status.username %} · {{ bot_status.username }}{% endif %}
+                    {% if bot_status.guild_count %} · {{ bot_status.guild_count }} sunucu{% endif %}
+                {% else %}
+                    Bot çevrimdışı veya ulaşılamıyor
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
 
         <div class="section">
