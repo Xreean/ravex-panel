@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ guild.name }} — Ayarlar | Ravex</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,21 +14,47 @@
             color: #e8eaed;
             min-height: 100vh;
         }
+
+        /* NAVBAR */
         .navbar {
             background: rgba(20, 22, 28, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 24px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 50;
+            backdrop-filter: blur(12px);
         }
         .nav-left { display: flex; align-items: center; gap: 14px; }
-        .nav-left a { color: #8b90a0; text-decoration: none; font-size: 13px; }
-        .nav-left a:hover { color: #e8eaed; }
-        .nav-left h1 { font-size: 16px; font-weight: 600; }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #e8eaed;
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .nav-brand img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+        .nav-sep {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+        }
+        .nav-back {
+            color: #8b90a0;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .nav-back:hover { color: #e8eaed; }
         .user-info { display: flex; align-items: center; gap: 12px; }
         .user-info img { width: 32px; height: 32px; border-radius: 50%; }
         .user-info span { font-size: 13px; color: #c5c8d0; }
@@ -38,22 +65,27 @@
             transition: 0.15s;
         }
         .btn-primary { background: #5865F2; color: #fff; }
-        .btn-primary:hover { background: #4752c4; }
+        .btn-primary:hover { background: #4752c4; transform: translateY(-1px); }
         .btn-danger {
             background: rgba(237,66,69,0.15); color: #ff6b6e;
             border: 1px solid rgba(237,66,69,0.25);
         }
+        .btn-danger:hover { background: rgba(237,66,69,0.25); }
+
+        /* LAYOUT */
         .layout {
             display: flex;
-            max-width: 1100px;
+            max-width: 1140px;
             margin: 0 auto;
-            min-height: calc(100vh - 62px);
+            min-height: calc(100vh - 57px);
         }
+
+        /* SIDEBAR */
         .sidebar {
-            width: 240px;
+            width: 250px;
             flex-shrink: 0;
             border-right: 1px solid rgba(255,255,255,0.06);
-            padding: 24px 14px;
+            padding: 20px 12px;
             background: #12151b;
             transition: width 0.25s ease, padding 0.25s ease;
             overflow: hidden;
@@ -93,25 +125,31 @@
             text-align: left;
             background: transparent;
             border: none;
+            border-left: 3px solid transparent;
             color: #b5bac1;
             font-size: 13px;
             font-weight: 500;
             font-family: inherit;
             padding: 10px 12px;
-            border-radius: 8px;
+            border-radius: 0 8px 8px 0;
             cursor: pointer;
             margin-bottom: 4px;
             max-height: 48px;
             overflow: hidden;
             transition:
-                background 0.15s, color 0.15s,
+                background 0.18s, color 0.18s, border-color 0.18s,
                 opacity 0.22s ease, transform 0.22s ease,
                 max-height 0.22s ease, margin 0.22s ease, padding 0.22s ease;
         }
-        .side-item:hover { background: rgba(255,255,255,0.04); color: #e8eaed; }
+        .side-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: #e8eaed;
+            transform: translateX(2px);
+        }
         .side-item.active {
-            background: rgba(88,101,242,0.15);
+            background: rgba(88,101,242,0.14);
             color: #c4cafc;
+            border-left-color: #5865F2;
         }
         .sidebar.collapsed .sidebar-title,
         .sidebar.collapsed .side-item {
@@ -123,31 +161,73 @@
             padding-bottom: 0;
             pointer-events: none;
         }
+
+        /* CONTENT */
         .content { flex: 1; padding: 28px 28px 60px; min-width: 0; }
-        .flash {
-            background: rgba(35,165,89,0.15);
-            border: 1px solid rgba(35,165,89,0.35);
-            color: #3dd68c;
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            font-weight: 500;
+
+        /* SUNUCU BAŞLIĞI */
+        .guild-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
-        .panel { display: none; }
-        .panel.active { display: block; }
-        .panel-title {
+        .guild-header-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #5865F2, #7b5cff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
             font-size: 20px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .guild-header-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .guild-header-meta h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .guild-header-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #a5b4fc;
+            background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.25);
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .panel { display: none; animation: fadeIn 0.2s ease; }
+        .panel.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .panel-title {
+            font-size: 18px;
             font-weight: 700;
             margin-bottom: 6px;
             letter-spacing: -0.02em;
         }
-        .panel-desc { color: #8b90a0; font-size: 13px; margin-bottom: 22px; }
+        .panel-desc { color: #8b90a0; font-size: 13px; margin-bottom: 20px; }
         .section {
             background: #171a21;
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 14px;
             padding: 8px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
         .setting-row {
             display: flex;
@@ -170,11 +250,13 @@
         }
         select:focus, input:focus { outline: none; border-color: #5865F2; }
         .badge-on, .badge-off {
-            border: none; cursor: pointer; padding: 6px 14px; border-radius: 20px;
+            border: none; cursor: pointer; padding: 7px 16px; border-radius: 20px;
             font-size: 12px; font-weight: 600; font-family: inherit;
+            transition: transform 0.12s, background 0.15s;
         }
         .badge-on { background: rgba(35,165,89,0.2); color: #3dd68c; }
         .badge-off { background: rgba(255,255,255,0.06); color: #8b90a0; }
+        .badge-on:hover, .badge-off:hover { transform: scale(1.05); }
         .kufur-form { display: flex; gap: 8px; margin-bottom: 14px; padding-top: 8px; }
         .kufur-form input { flex: 1; min-width: 0; }
         .kufur-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
@@ -184,23 +266,108 @@
             font-family: inherit;
         }
         .kufur-tag:hover { background: rgba(237,66,69,0.2); color: #ff6b6e; }
+
+        /* TOAST */
+        .toast-wrap {
+            position: fixed;
+            top: 72px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            background: #1a1d26;
+            border: 1px solid rgba(35,165,89,0.4);
+            color: #3dd68c;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.4s forwards;
+            pointer-events: auto;
+            min-width: 200px;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toastOut {
+            to { opacity: 0; transform: translateX(40px); }
+        }
+
+        /* MOBİL */
+        .mobile-menu-btn {
+            display: none;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #e8eaed;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: inherit;
+        }
         @media (max-width: 800px) {
+            .mobile-menu-btn { display: inline-flex; }
             .layout { flex-direction: column; }
             .sidebar {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid rgba(255,255,255,0.06);
-                padding: 14px;
+                padding: 12px;
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                opacity: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.25s ease;
+            }
+            .sidebar.mobile-open {
+                max-height: 500px;
+                padding: 12px;
+                opacity: 1;
             }
             .sidebar.collapsed { width: 100%; }
+            .sidebar.collapsed .sidebar-title,
+            .sidebar.collapsed .side-item {
+                opacity: 1;
+                transform: none;
+                max-height: 48px;
+                pointer-events: auto;
+                padding: 10px 12px;
+                margin-bottom: 4px;
+            }
+            .sidebar-toggle { display: none; }
+            .content { padding: 20px 16px 40px; }
+            .setting-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            select, input[type="text"] { width: 100%; min-width: 0; }
+            .setting-row form {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            .guild-header { margin-bottom: 20px; }
+            .toast-wrap { left: 12px; right: 12px; top: 64px; }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-left">
-            <a href="/">← Sunucular</a>
-            <h1>{{ guild.name }}</h1>
+            <a class="nav-brand" href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Ravex">
+                <span>Ravex</span>
+            </a>
+            <div class="nav-sep"></div>
+            <a class="nav-back" href="/">← Sunucular</a>
+            <button type="button" class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
         <div class="user-info">
             {% if user.avatar %}
@@ -210,6 +377,16 @@
             <a class="btn btn-danger" href="/logout">Çıkış</a>
         </div>
     </nav>
+
+    <div class="toast-wrap" id="toastWrap">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="toast">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
     <div class="layout">
         <aside class="sidebar" id="sidebar">
@@ -243,13 +420,20 @@
         </aside>
 
         <main class="content">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="flash">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+            <!-- SUNUCU BAŞLIĞI -->
+            <div class="guild-header">
+                <div class="guild-header-icon">
+                    {% if guild.icon %}
+                    <img src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" alt="">
+                    {% else %}
+                    {{ guild.name[:1] }}
+                    {% endif %}
+                </div>
+                <div class="guild-header-meta">
+                    <h2>{{ guild.name }}</h2>
+                    <span class="guild-header-badge">Ayarlar</span>
+                </div>
+            </div>
 
             <!-- GENEL ROLLER -->
             <div class="panel active" id="panel-roller">
@@ -469,6 +653,7 @@
         const panels = document.querySelectorAll('.panel');
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
         function showPanel(id) {
             items.forEach(btn => {
@@ -478,6 +663,10 @@
                 panel.classList.toggle('active', panel.id === 'panel-' + id);
             });
             localStorage.setItem('ravex_settings_panel', id);
+            // Mobilde panel seçince menüyü kapat
+            if (window.innerWidth <= 800) {
+                sidebar.classList.remove('mobile-open');
+            }
         }
 
         items.forEach(btn => {
@@ -489,7 +678,7 @@
             showPanel(saved);
         }
 
-        if (localStorage.getItem('ravex_sidebar_collapsed') === '1') {
+        if (localStorage.getItem('ravex_sidebar_collapsed') === '1' && window.innerWidth > 800) {
             sidebar.classList.add('collapsed');
         }
 
@@ -500,6 +689,15 @@
                 sidebar.classList.contains('collapsed') ? '1' : '0'
             );
         });
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+
+        // Toast'ları 3 sn sonra DOM'dan temizle
+        setTimeout(() => {
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+        }, 3000);
     </script>
 </body>
 </html>
