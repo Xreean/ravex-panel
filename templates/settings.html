@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ guild.name }} — Ayarlar | Ravex</title>
+    <title>Ayarlar | Ravex</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -20,8 +20,6 @@
             color: #e8eaed;
             min-height: 100vh;
         }
-
-        /* NAVBAR */
         .navbar {
             background: rgba(20, 22, 28, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -69,15 +67,12 @@
         .theme-dot[data-theme="blue"] { background: #3b82f6; }
         .theme-dot[data-theme="green"] { background: #22c55e; }
 
-        /* LAYOUT */
         .layout {
             display: flex;
             max-width: 1140px;
             margin: 0 auto;
             min-height: calc(100vh - 57px);
         }
-
-        /* SIDEBAR */
         .sidebar {
             width: 250px;
             flex-shrink: 0;
@@ -100,14 +95,13 @@
             font-weight: 700;
             margin-bottom: 14px;
             font-family: inherit;
-            transition: 0.15s;
         }
         .sidebar-toggle:hover { background: rgba(255,255,255,0.08); color: #fff; }
         .sidebar-title {
             font-size: 11px; font-weight: 600; color: #6b7080;
             text-transform: uppercase; letter-spacing: 0.06em;
             padding: 0 10px 12px; max-height: 40px; overflow: hidden;
-            transition: opacity 0.2s ease, transform 0.2s ease, max-height 0.2s ease, margin 0.2s ease, padding 0.2s ease;
+            transition: 0.2s ease;
         }
         .side-item {
             display: flex; align-items: center; gap: 10px;
@@ -118,9 +112,7 @@
             font-family: inherit; padding: 10px 12px;
             border-radius: 0 8px 8px 0; cursor: pointer;
             margin-bottom: 4px; max-height: 48px; overflow: hidden;
-            transition: background 0.18s, color 0.18s, border-color 0.18s,
-                opacity 0.22s ease, transform 0.22s ease,
-                max-height 0.22s ease, margin 0.22s ease, padding 0.22s ease;
+            transition: 0.18s ease;
         }
         .side-item:hover {
             background: rgba(255,255,255,0.05);
@@ -129,7 +121,7 @@
         }
         .side-item.active {
             background: var(--accent-soft);
-            color: #c4cafc;
+            color: #e8eaed;
             border-left-color: var(--accent);
         }
         .side-item kbd {
@@ -147,7 +139,6 @@
             pointer-events: none;
         }
 
-        /* CONTENT */
         .content { flex: 1; padding: 28px 28px 60px; min-width: 0; }
 
         .guild-header {
@@ -168,12 +159,11 @@
         }
         .guild-header-badge {
             display: inline-block; font-size: 11px; font-weight: 600;
-            color: #a5b4fc; background: var(--accent-soft);
+            color: #c4cafc; background: var(--accent-soft);
             border: 1px solid var(--accent-border);
             padding: 3px 8px; border-radius: 6px;
         }
 
-        /* ÖZET KART */
         .summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -197,7 +187,7 @@
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .panel-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; }
+        .panel-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
         .panel-desc { color: #8b90a0; font-size: 13px; margin-bottom: 16px; }
 
         .search-box {
@@ -249,7 +239,7 @@
         .badge-on, .badge-off {
             border: none; cursor: pointer; padding: 7px 16px; border-radius: 20px;
             font-size: 12px; font-weight: 600; font-family: inherit;
-            transition: transform 0.12s, background 0.15s;
+            transition: transform 0.12s;
         }
         .badge-on { background: rgba(35,165,89,0.2); color: #3dd68c; }
         .badge-off { background: rgba(255,255,255,0.06); color: #8b90a0; }
@@ -264,7 +254,6 @@
         }
         .kufur-tag:hover { background: rgba(237,66,69,0.2); color: #ff6b6e; }
 
-        /* TOAST */
         .toast-wrap {
             position: fixed; top: 72px; right: 20px; z-index: 100;
             display: flex; flex-direction: column; gap: 10px; pointer-events: none;
@@ -277,7 +266,7 @@
             font-size: 13px; font-weight: 600;
             box-shadow: 0 8px 28px rgba(0,0,0,0.35);
             animation: toastIn 0.3s ease, toastOut 0.3s ease 2.4s forwards;
-            pointer-events: auto; min-width: 200px;
+            min-width: 200px;
         }
         @keyframes toastIn {
             from { opacity: 0; transform: translateX(40px); }
@@ -294,9 +283,7 @@
             color: #e8eaed; border-radius: 8px;
             padding: 8px 12px; font-size: 16px; cursor: pointer; font-family: inherit;
         }
-        .hint {
-            font-size: 11px; color: #5c6370; margin-top: 16px;
-        }
+        .hint { font-size: 11px; color: #5c6370; margin-top: 16px; }
 
         @media (max-width: 800px) {
             .mobile-menu-btn { display: inline-flex; }
@@ -326,6 +313,10 @@
     </style>
 </head>
 <body>
+    {% set gid = guild.id if guild.id is defined else guild.get('id') %}
+    {% set gname = guild.name if guild.name is defined else guild.get('name', 'Sunucu') %}
+    {% set gicon = guild.icon if guild.icon is defined else guild.get('icon') %}
+
     <nav class="navbar">
         <div class="nav-left">
             <a class="nav-brand" href="/">
@@ -394,29 +385,32 @@
         <main class="content">
             <div class="guild-header">
                 <div class="guild-header-icon">
-                    {% if guild.icon %}
-                    <img src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" alt="">
-                    {% else %}{{ guild.name[:1] }}{% endif %}
+                    {% if gicon %}
+                    <img src="https://cdn.discordapp.com/icons/{{ gid }}/{{ gicon }}.png" alt="">
+                    {% else %}{{ gname[:1] }}{% endif %}
                 </div>
                 <div class="guild-header-meta">
-                    <h2>{{ guild.name }}</h2>
+                    <h2>{{ gname }}</h2>
                     <span class="guild-header-badge">Ayarlar</span>
                 </div>
             </div>
 
-            <!-- ÖZET -->
-            {% set guard_keys = ['guard_kanal','guard_rol','guard_bot','guard_webhook','guard_rightclick'] %}
-            {% set guard_on = namespace(settings.get(k) for k in guard_keys if settings.get(k)) %}
-            {% set filt_keys = ['filter_kufur','filter_reklam','filter_caps','filter_spam'] %}
-            {% set filt_on = namespace(1 for k in filt_keys if settings.get(k, True)) %}
+            {% set ns = namespace(guard_on=0, filt_on=0) %}
+            {% for k in ['guard_kanal','guard_rol','guard_bot','guard_webhook','guard_rightclick'] %}
+                {% if settings.get(k) %}{% set ns.guard_on = ns.guard_on + 1 %}{% endif %}
+            {% endfor %}
+            {% for k in ['filter_kufur','filter_reklam','filter_caps','filter_spam'] %}
+                {% if settings.get(k, True) %}{% set ns.filt_on = ns.filt_on + 1 %}{% endif %}
+            {% endfor %}
+
             <div class="summary">
                 <div class="summary-card">
                     <div class="label">Guard</div>
-                    <div class="value {{ 'on' if guard_on else 'off' }}">{{ guard_on }}/5 açık</div>
+                    <div class="value {{ 'on' if ns.guard_on else 'off' }}">{{ ns.guard_on }}/5 açık</div>
                 </div>
                 <div class="summary-card">
                     <div class="label">Mesaj Filtreleri</div>
-                    <div class="value {{ 'on' if filt_on else 'off' }}">{{ filt_on }}/4 açık</div>
+                    <div class="value {{ 'on' if ns.filt_on else 'off' }}">{{ ns.filt_on }}/4 açık</div>
                 </div>
                 <div class="summary-card">
                     <div class="label">Seviye</div>
@@ -449,7 +443,7 @@
                     {% for key, label in role_settings %}
                     <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
+                        <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
                             <input type="hidden" name="key" value="{{ key }}">
                             <select name="value" class="role-select">
                                 <option value="">— Seçilmedi —</option>
@@ -480,7 +474,7 @@
                     {% for key, label in channel_settings %}
                     <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
+                        <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
                             <input type="hidden" name="key" value="{{ key }}">
                             <select name="value" class="channel-select">
                                 <option value="">— Seçilmedi —</option>
@@ -510,7 +504,7 @@
                     {% for key, label in guards %}
                     <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}" data-save-key="{{ key }}">
+                        <form method="POST" action="/guild/{{ gid }}/toggle/{{ key }}" data-save-key="{{ key }}">
                             <button type="submit" class="{{ 'badge-on' if settings.get(key) else 'badge-off' }}">
                                 {{ 'Açık' if settings.get(key) else 'Kapalı' }}
                             </button>
@@ -534,7 +528,7 @@
                     {% for key, label in filters %}
                     <div class="setting-row" data-key="{{ key }}">
                         <span class="setting-label">{{ label }}</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}" data-save-key="{{ key }}">
+                        <form method="POST" action="/guild/{{ gid }}/toggle/{{ key }}" data-save-key="{{ key }}">
                             <button type="submit" class="{{ 'badge-on' if settings.get(key, True) else 'badge-off' }}">
                                 {{ 'Açık' if settings.get(key, True) else 'Kapalı' }}
                             </button>
@@ -551,7 +545,7 @@
                 <div class="section">
                     <div class="setting-row" data-key="oto_nick">
                         <span class="setting-label">İsim | Yaş Nick</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/oto_nick" data-save-key="oto_nick">
+                        <form method="POST" action="/guild/{{ gid }}/toggle/oto_nick" data-save-key="oto_nick">
                             <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}">
                                 {{ 'Açık' if settings.get('oto_nick') else 'Kapalı' }}
                             </button>
@@ -567,7 +561,7 @@
                 <div class="section">
                     <div class="setting-row" data-key="seviye_sistemi">
                         <span class="setting-label">Seviye / XP Sistemi</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/seviye_sistemi" data-save-key="seviye_sistemi">
+                        <form method="POST" action="/guild/{{ gid }}/toggle/seviye_sistemi" data-save-key="seviye_sistemi">
                             <button type="submit" class="{{ 'badge-on' if settings.get('seviye_sistemi', True) else 'badge-off' }}">
                                 {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
                             </button>
@@ -583,7 +577,7 @@
                 <div class="section">
                     <div class="setting-row" data-key="dogum_gunu_sistemi">
                         <span class="setting-label">Doğum Günü Sistemi</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/toggle/dogum_gunu_sistemi" data-save-key="dogum_gunu_sistemi">
+                        <form method="POST" action="/guild/{{ gid }}/toggle/dogum_gunu_sistemi" data-save-key="dogum_gunu_sistemi">
                             <button type="submit" class="{{ 'badge-on' if settings.get('dogum_gunu_sistemi') else 'badge-off' }}">
                                 {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
                             </button>
@@ -591,7 +585,7 @@
                     </div>
                     <div class="setting-row" data-key="dogum_gunu_rol">
                         <span class="setting-label">Doğum Günü Rolü</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_rol">
+                        <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_rol">
                             <input type="hidden" name="key" value="dogum_gunu_rol">
                             <select name="value" class="role-select">
                                 <option value="">— Seçilmedi —</option>
@@ -604,7 +598,7 @@
                     </div>
                     <div class="setting-row" data-key="dogum_gunu_kanali">
                         <span class="setting-label">Duyuru Kanalı</span>
-                        <form method="POST" action="/guild/{{ guild.id }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_kanali">
+                        <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_kanali">
                             <input type="hidden" name="key" value="dogum_gunu_kanali">
                             <select name="value" class="channel-select">
                                 <option value="">— Seçilmedi —</option>
@@ -618,12 +612,12 @@
                 </div>
             </div>
 
-            <!-- KÜFÜR LİSTESİ -->
+            <!-- KÜFÜR -->
             <div class="panel" id="panel-kufur">
                 <div class="panel-title">Küfür Listesi</div>
                 <p class="panel-desc">Engellenecek kelimeleri yönet. (Küfür filtresi açıksa kullanılır)</p>
                 <div class="section" style="padding: 16px 20px;">
-                    <form method="POST" action="/guild/{{ guild.id }}/kufur" class="kufur-form">
+                    <form method="POST" action="/guild/{{ gid }}/kufur" class="kufur-form">
                         <input type="hidden" name="action" value="ekle">
                         <input type="text" name="kelime" placeholder="Eklenecek kelime">
                         <button type="submit" class="btn btn-primary">Ekle</button>
@@ -631,14 +625,14 @@
                     <div class="kufur-tags">
                         {% set kufur_listesi = settings.get('kufur_listesi', ['amk', 'aq', 'orospu', 'piç', 'sik', 'yarrak', 'ibne', 'göt']) %}
                         {% for kelime in kufur_listesi %}
-                        <form method="POST" action="/guild/{{ guild.id }}/kufur" style="display:inline;">
+                        <form method="POST" action="/guild/{{ gid }}/kufur" style="display:inline;">
                             <input type="hidden" name="action" value="sil">
                             <input type="hidden" name="kelime" value="{{ kelime }}">
                             <button type="submit" class="kufur-tag">{{ kelime }} ×</button>
                         </form>
                         {% endfor %}
                     </div>
-                    <form method="POST" action="/guild/{{ guild.id }}/kufur">
+                    <form method="POST" action="/guild/{{ gid }}/kufur">
                         <input type="hidden" name="action" value="sifirla">
                         <button type="submit" class="btn btn-danger">Listeyi Varsayılana Sıfırla</button>
                     </form>
@@ -680,23 +674,24 @@
 
         mobileMenuBtn.addEventListener('click', () => sidebar.classList.toggle('mobile-open'));
 
-        // Klavye 1-8
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
             const n = parseInt(e.key, 10);
             if (n >= 1 && n <= 8) showPanel(panelOrder[n - 1]);
         });
 
-        // Tema
         const themes = {
-            purple: { accent: '#5865F2', accent2: '#7b5cff' },
-            blue:   { accent: '#3b82f6', accent2: '#60a5fa' },
-            green:  { accent: '#22c55e', accent2: '#4ade80' }
+            purple: { accent: '#5865F2', accent2: '#7b5cff', soft: 'rgba(88,101,242,0.15)', border: 'rgba(88,101,242,0.35)' },
+            blue:   { accent: '#3b82f6', accent2: '#60a5fa', soft: 'rgba(59,130,246,0.15)', border: 'rgba(59,130,246,0.35)' },
+            green:  { accent: '#22c55e', accent2: '#4ade80', soft: 'rgba(34,197,94,0.15)', border: 'rgba(34,197,94,0.35)' }
         };
         function applyTheme(name) {
             const t = themes[name] || themes.purple;
-            document.documentElement.style.setProperty('--accent', t.accent);
-            document.documentElement.style.setProperty('--accent-2', t.accent2);
+            const r = document.documentElement;
+            r.style.setProperty('--accent', t.accent);
+            r.style.setProperty('--accent-2', t.accent2);
+            r.style.setProperty('--accent-soft', t.soft);
+            r.style.setProperty('--accent-border', t.border);
             document.querySelectorAll('.theme-dot').forEach(d => {
                 d.classList.toggle('active', d.dataset.theme === name);
             });
@@ -707,7 +702,6 @@
         });
         applyTheme(localStorage.getItem('ravex_theme') || 'purple');
 
-        // Rol / kanal arama: option filtre
         document.querySelectorAll('.search-box').forEach(box => {
             box.addEventListener('input', () => {
                 const q = box.value.trim().toLowerCase();
@@ -724,14 +718,12 @@
             });
         });
 
-        // Kaydetmeden önce hangi satır olduğunu hatırla
         document.querySelectorAll('form[data-save-key]').forEach(form => {
             form.addEventListener('submit', () => {
                 localStorage.setItem('ravex_last_saved_key', form.dataset.saveKey);
             });
         });
 
-        // Sayfa yüklenince son kaydı vurgula
         const lastKey = localStorage.getItem('ravex_last_saved_key');
         if (lastKey) {
             const row = document.querySelector('.setting-row[data-key="' + lastKey + '"]');
