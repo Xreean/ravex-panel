@@ -58,10 +58,7 @@
             transition: width 0.25s ease, padding 0.25s ease;
             overflow: hidden;
         }
-        .sidebar.collapsed {
-            width: 56px;
-            padding: 16px 8px;
-        }
+        .sidebar.collapsed { width: 56px; padding: 16px 8px; }
         .sidebar-toggle {
             width: 100%;
             background: rgba(255,255,255,0.04);
@@ -76,10 +73,7 @@
             font-family: inherit;
             transition: 0.15s;
         }
-        .sidebar-toggle:hover {
-            background: rgba(255,255,255,0.08);
-            color: #fff;
-        }
+        .sidebar-toggle:hover { background: rgba(255,255,255,0.08); color: #fff; }
         .sidebar-title {
             font-size: 11px;
             font-weight: 600;
@@ -110,20 +104,15 @@
             max-height: 48px;
             overflow: hidden;
             transition:
-                background 0.15s,
-                color 0.15s,
-                opacity 0.22s ease,
-                transform 0.22s ease,
-                max-height 0.22s ease,
-                margin 0.22s ease,
-                padding 0.22s ease;
+                background 0.15s, color 0.15s,
+                opacity 0.22s ease, transform 0.22s ease,
+                max-height 0.22s ease, margin 0.22s ease, padding 0.22s ease;
         }
         .side-item:hover { background: rgba(255,255,255,0.04); color: #e8eaed; }
         .side-item.active {
             background: rgba(88,101,242,0.15);
             color: #c4cafc;
         }
-        /* Kapalıyken başlık + emojiler + yazılar yukarı kayıp kaybolur */
         .sidebar.collapsed .sidebar-title,
         .sidebar.collapsed .side-item {
             opacity: 0;
@@ -134,11 +123,7 @@
             padding-bottom: 0;
             pointer-events: none;
         }
-        .content {
-            flex: 1;
-            padding: 28px 28px 60px;
-            min-width: 0;
-        }
+        .content { flex: 1; padding: 28px 28px 60px; min-width: 0; }
         .flash {
             background: rgba(35,165,89,0.15);
             border: 1px solid rgba(35,165,89,0.35);
@@ -157,11 +142,7 @@
             margin-bottom: 6px;
             letter-spacing: -0.02em;
         }
-        .panel-desc {
-            color: #8b90a0;
-            font-size: 13px;
-            margin-bottom: 22px;
-        }
+        .panel-desc { color: #8b90a0; font-size: 13px; margin-bottom: 22px; }
         .section {
             background: #171a21;
             border: 1px solid rgba(255,255,255,0.05);
@@ -175,9 +156,7 @@
             padding: 14px 0;
             gap: 16px;
         }
-        .setting-row + .setting-row {
-            border-top: 1px solid rgba(255,255,255,0.04);
-        }
+        .setting-row + .setting-row { border-top: 1px solid rgba(255,255,255,0.04); }
         .setting-label { font-size: 14px; font-weight: 500; color: #dbdee1; }
         select, input[type="text"] {
             background: #0f1115;
@@ -246,6 +225,9 @@
             <button type="button" class="side-item" data-panel="guard">
                 <span>🛡️</span><span class="side-item-text">Guard (Koruma)</span>
             </button>
+            <button type="button" class="side-item" data-panel="filtreler">
+                <span>🚫</span><span class="side-item-text">Mesaj Filtreleri</span>
+            </button>
             <button type="button" class="side-item" data-panel="nick">
                 <span>📛</span><span class="side-item-text">Nick Sistemi</span>
             </button>
@@ -256,7 +238,7 @@
                 <span>🎂</span><span class="side-item-text">Doğum Günü</span>
             </button>
             <button type="button" class="side-item" data-panel="kufur">
-                <span>🤬</span><span class="side-item-text">Küfür Filtresi</span>
+                <span>🤬</span><span class="side-item-text">Küfür Listesi</span>
             </button>
         </aside>
 
@@ -269,6 +251,7 @@
                 {% endif %}
             {% endwith %}
 
+            <!-- GENEL ROLLER -->
             <div class="panel active" id="panel-roller">
                 <div class="panel-title">Genel Roller</div>
                 <p class="panel-desc">Yetkili, oto rol, jail ve diğer temel roller.</p>
@@ -299,6 +282,7 @@
                 </div>
             </div>
 
+            <!-- KANALLAR -->
             <div class="panel" id="panel-kanallar">
                 <div class="panel-title">Kanallar</div>
                 <p class="panel-desc">Log, hoş geldin ve diğer kanal ayarları.</p>
@@ -328,6 +312,7 @@
                 </div>
             </div>
 
+            <!-- GUARD -->
             <div class="panel" id="panel-guard">
                 <div class="panel-title">Guard (Koruma)</div>
                 <p class="panel-desc">İzinsiz işlemleri engelleyen koruma modülleri.</p>
@@ -352,6 +337,31 @@
                 </div>
             </div>
 
+            <!-- MESAJ FİLTRELERİ -->
+            <div class="panel" id="panel-filtreler">
+                <div class="panel-title">Mesaj Filtreleri</div>
+                <p class="panel-desc">Küfür, reklam, caps ve spam korumalarını aç / kapat.</p>
+                <div class="section">
+                    {% set filters = [
+                        ('filter_kufur', 'Küfür Filtresi'),
+                        ('filter_reklam', 'Reklam / Link Filtresi'),
+                        ('filter_caps', 'Caps Filtresi'),
+                        ('filter_spam', 'Spam Koruması')
+                    ] %}
+                    {% for key, label in filters %}
+                    <div class="setting-row">
+                        <span class="setting-label">{{ label }}</span>
+                        <form method="POST" action="/guild/{{ guild.id }}/toggle/{{ key }}">
+                            <button type="submit" class="{{ 'badge-on' if settings.get(key, True) else 'badge-off' }}">
+                                {{ 'Açık' if settings.get(key, True) else 'Kapalı' }}
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- NICK -->
             <div class="panel" id="panel-nick">
                 <div class="panel-title">Nick Sistemi</div>
                 <p class="panel-desc">İsim | Yaş formatında takma ad sistemi.</p>
@@ -367,8 +377,9 @@
                 </div>
             </div>
 
+            <!-- SEVİYE -->
             <div class="panel" id="panel-seviye">
-                <div class="panel-title">📊 Seviye Sistemi</div>
+                <div class="panel-title">Seviye Sistemi</div>
                 <p class="panel-desc">Mesajlardan XP ve seviye atlama.</p>
                 <div class="section">
                     <div class="setting-row">
@@ -382,8 +393,9 @@
                 </div>
             </div>
 
+            <!-- DOĞUM GÜNÜ -->
             <div class="panel" id="panel-dogumgunu">
-                <div class="panel-title">🎂 Doğum Günü Sistemi</div>
+                <div class="panel-title">Doğum Günü Sistemi</div>
                 <p class="panel-desc">Doğum gününde rol ve duyuru ayarları.</p>
                 <div class="section">
                     <div class="setting-row">
@@ -423,9 +435,10 @@
                 </div>
             </div>
 
+            <!-- KÜFÜR LİSTESİ -->
             <div class="panel" id="panel-kufur">
-                <div class="panel-title">Küfür Filtresi</div>
-                <p class="panel-desc">Engellenecek kelimeleri yönet.</p>
+                <div class="panel-title">Küfür Listesi</div>
+                <p class="panel-desc">Engellenecek kelimeleri yönet. (Küfür filtresi açıksa kullanılır)</p>
                 <div class="section" style="padding: 16px 20px;">
                     <form method="POST" action="/guild/{{ guild.id }}/kufur" class="kufur-form">
                         <input type="hidden" name="action" value="ekle">
