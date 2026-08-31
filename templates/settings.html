@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayarlar | Ravex</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#5865F2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -66,7 +71,6 @@
         .theme-dot[data-theme="purple"] { background: #5865F2; }
         .theme-dot[data-theme="blue"] { background: #3b82f6; }
         .theme-dot[data-theme="green"] { background: #22c55e; }
-
         .layout {
             display: flex;
             max-width: 1140px;
@@ -138,9 +142,7 @@
             max-height: 0; margin: 0; padding-top: 0; padding-bottom: 0;
             pointer-events: none;
         }
-
         .content { flex: 1; padding: 28px 28px 60px; min-width: 0; }
-
         .guild-header {
             display: flex; align-items: center; gap: 14px;
             margin-bottom: 20px; padding-bottom: 18px;
@@ -163,7 +165,6 @@
             border: 1px solid var(--accent-border);
             padding: 3px 8px; border-radius: 6px;
         }
-
         .summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -180,7 +181,6 @@
         .summary-card .value { font-size: 14px; font-weight: 600; }
         .summary-card .value.on { color: #3dd68c; }
         .summary-card .value.off { color: #8b90a0; }
-
         .panel { display: none; animation: fadeIn 0.2s ease; }
         .panel.active { display: block; }
         @keyframes fadeIn {
@@ -189,7 +189,6 @@
         }
         .panel-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
         .panel-desc { color: #8b90a0; font-size: 13px; margin-bottom: 16px; }
-
         .search-box {
             width: 100%;
             background: #0f1115;
@@ -202,7 +201,6 @@
             margin-bottom: 12px;
         }
         .search-box:focus { outline: none; border-color: var(--accent); }
-
         .section {
             background: #171a21;
             border: 1px solid rgba(255,255,255,0.05);
@@ -253,7 +251,6 @@
             font-family: inherit;
         }
         .kufur-tag:hover { background: rgba(237,66,69,0.2); color: #ff6b6e; }
-
         .toast-wrap {
             position: fixed; top: 72px; right: 20px; z-index: 100;
             display: flex; flex-direction: column; gap: 10px; pointer-events: none;
@@ -275,7 +272,6 @@
         @keyframes toastOut {
             to { opacity: 0; transform: translateX(40px); }
         }
-
         .mobile-menu-btn {
             display: none;
             background: rgba(255,255,255,0.06);
@@ -284,7 +280,6 @@
             padding: 8px 12px; font-size: 16px; cursor: pointer; font-family: inherit;
         }
         .hint { font-size: 11px; color: #5c6370; margin-top: 16px; }
-
         @media (max-width: 800px) {
             .mobile-menu-btn { display: inline-flex; }
             .layout { flex-direction: column; }
@@ -429,7 +424,6 @@
                 </div>
             </div>
 
-            <!-- ROLLER -->
             <div class="panel active" id="panel-roller">
                 <div class="panel-title">Genel Roller</div>
                 <p class="panel-desc">Yetkili, oto rol, jail ve diğer temel roller.</p>
@@ -461,7 +455,6 @@
                 </div>
             </div>
 
-            <!-- KANALLAR -->
             <div class="panel" id="panel-kanallar">
                 <div class="panel-title">Kanallar</div>
                 <p class="panel-desc">Log, hoş geldin ve diğer kanal ayarları.</p>
@@ -492,7 +485,6 @@
                 </div>
             </div>
 
-            <!-- GUARD -->
             <div class="panel" id="panel-guard">
                 <div class="panel-title">Guard (Koruma)</div>
                 <p class="panel-desc">İzinsiz işlemleri engelleyen koruma modülleri.</p>
@@ -517,7 +509,6 @@
                 </div>
             </div>
 
-            <!-- FİLTRELER -->
             <div class="panel" id="panel-filtreler">
                 <div class="panel-title">Mesaj Filtreleri</div>
                 <p class="panel-desc">Küfür, reklam, caps ve spam korumalarını aç / kapat.</p>
@@ -541,7 +532,6 @@
                 </div>
             </div>
 
-            <!-- NICK -->
             <div class="panel" id="panel-nick">
                 <div class="panel-title">Nick Sistemi</div>
                 <p class="panel-desc">İsim | Yaş formatında takma ad sistemi.</p>
@@ -557,7 +547,6 @@
                 </div>
             </div>
 
-            <!-- SEVİYE -->
             <div class="panel" id="panel-seviye">
                 <div class="panel-title">Seviye Sistemi</div>
                 <p class="panel-desc">Mesajlardan XP ve seviye atlama.</p>
@@ -573,7 +562,6 @@
                 </div>
             </div>
 
-            <!-- DOĞUM GÜNÜ -->
             <div class="panel" id="panel-dogumgunu">
                 <div class="panel-title">Doğum Günü Sistemi</div>
                 <p class="panel-desc">Doğum gününde rol ve duyuru ayarları.</p>
@@ -615,7 +603,6 @@
                 </div>
             </div>
 
-            <!-- KÜFÜR -->
             <div class="panel" id="panel-kufur">
                 <div class="panel-title">Küfür Listesi</div>
                 <p class="panel-desc">Engellenecek kelimeleri yönet. (Küfür filtresi açıksa kullanılır)</p>
@@ -642,7 +629,6 @@
                 </div>
             </div>
 
-            <!-- GEÇMİŞ -->
             <div class="panel" id="panel-gecmis">
                 <div class="panel-title">Değişiklik Geçmişi</div>
                 <p class="panel-desc">Bu sunucuda yapılan son ayar değişiklikleri.</p>
@@ -764,6 +750,12 @@
         setTimeout(() => {
             document.querySelectorAll('.toast').forEach(t => t.remove());
         }, 3000);
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/static/sw.js").catch(() => {});
+            });
+        }
     </script>
 </body>
 </html>
