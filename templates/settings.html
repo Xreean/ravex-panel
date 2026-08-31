@@ -294,7 +294,7 @@
                 max-height: 0; padding: 0 12px; opacity: 0; overflow: hidden;
                 transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.25s ease;
             }
-            .sidebar.mobile-open { max-height: 520px; padding: 12px; opacity: 1; }
+            .sidebar.mobile-open { max-height: 560px; padding: 12px; opacity: 1; }
             .sidebar.collapsed { width: 100%; }
             .sidebar.collapsed .sidebar-title,
             .sidebar.collapsed .side-item {
@@ -379,6 +379,9 @@
             </button>
             <button type="button" class="side-item" data-panel="kufur">
                 <span>🤬</span><span class="side-item-text">Küfür Listesi</span><kbd>8</kbd>
+            </button>
+            <button type="button" class="side-item" data-panel="gecmis">
+                <span>📋</span><span class="side-item-text">Geçmiş</span><kbd>9</kbd>
             </button>
         </aside>
 
@@ -639,7 +642,31 @@
                 </div>
             </div>
 
-            <p class="hint">Kısayollar: klavyeden 1–8 ile kategoriler arası geçiş</p>
+            <!-- GEÇMİŞ -->
+            <div class="panel" id="panel-gecmis">
+                <div class="panel-title">Değişiklik Geçmişi</div>
+                <p class="panel-desc">Bu sunucuda yapılan son ayar değişiklikleri.</p>
+                <div class="section" style="padding: 12px 16px;">
+                    {% if audit_logs %}
+                        {% for log in audit_logs %}
+                        <div class="setting-row" style="padding: 10px 0;">
+                            <div>
+                                <div class="setting-label" style="margin-bottom:4px;">{{ log.detail }}</div>
+                                <div style="font-size:12px;color:#8b90a0;">
+                                    {{ log.username }} · {{ log.action }} · {{ log.created_at }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="padding: 18px 4px; color:#8b90a0; font-size:13px;">
+                            Henüz kayıt yok. Bir ayar değişince burada görünecek.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p class="hint">Kısayollar: klavyeden 1–9 ile kategoriler arası geçiş</p>
         </main>
     </div>
 
@@ -649,7 +676,7 @@
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const panelOrder = ['roller','kanallar','guard','filtreler','nick','seviye','dogumgunu','kufur'];
+        const panelOrder = ['roller','kanallar','guard','filtreler','nick','seviye','dogumgunu','kufur','gecmis'];
 
         function showPanel(id) {
             items.forEach(btn => btn.classList.toggle('active', btn.dataset.panel === id));
@@ -677,7 +704,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
             const n = parseInt(e.key, 10);
-            if (n >= 1 && n <= 8) showPanel(panelOrder[n - 1]);
+            if (n >= 1 && n <= 9) showPanel(panelOrder[n - 1]);
         });
 
         const themes = {
