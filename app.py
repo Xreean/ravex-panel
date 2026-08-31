@@ -276,7 +276,7 @@ def toggle_setting(guild_id, key):
     allowed_keys = [
         "guard_kanal", "guard_rol", "guard_bot",
         "guard_webhook", "guard_rightclick", "oto_nick",
-        "seviye_sistemi", "dogum_gunu_sistemi"
+        "seviye_sistemi", "dogum_gunu_sistemi",
         "filter_kufur", "filter_reklam", "filter_caps", "filter_spam"
 ]
     if key not in allowed_keys:
