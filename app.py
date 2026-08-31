@@ -79,6 +79,49 @@ def get_bot_guilds():
         print(f"get_bot_guilds hata: {e}")
     return set()
 
+def get_bot_status():
+    """Bot token ile Discord API'ye istek atar; online + sunucu sayısı döner."""
+    token = os.getenv("DISCORD_TOKEN") or os.getenv("DISCORD_BOT_TOKEN")
+    if not token:
+        return {"online": False, "guild_count": 0, "username": None}
+
+    try:
+        import urllib.request
+        import json as _json
+
+        headers = {
+            "Authorization": f"Bot {token}",
+            "User-Agent": "RavexPanel (https://ravex-panel.onrender.com, 1.0)"
+        }
+
+        req = urllib.request.Request(
+            "https://discord.com/api/v10/users/@me",
+            headers=headers
+        )
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = _json.loads(resp.read().decode())
+
+        guild_count = 0
+        try:
+            req2 = urllib.request.Request(
+                "https://discord.com/api/v10/users/@me/guilds",
+                headers=headers
+            )
+            with urllib.request.urlopen(req2, timeout=8) as resp2:
+                guilds = _json.loads(resp2.read().decode())
+                if isinstance(guilds, list):
+                    guild_count = len(guilds)
+        except Exception:
+            pass
+
+        return {
+            "online": True,
+            "guild_count": guild_count,
+            "username": data.get("username"),
+        }
+    except Exception:
+        return {"online": False, "guild_count": 0, "username": None}
+
 def get_user_guilds_split(user_guilds, bot_guild_ids):
     """Botun olduğu ve olmadığı sunucuları ayırır"""
     with_bot = []
@@ -146,6 +189,7 @@ def get_guild_channels(guild_id):
 def index():
     user = session.get("user")
     client_id = os.getenv("DISCORD_CLIENT_ID")
+    bot_status = get_bot_status()
 
     if not user:
         return render_template(
@@ -153,8 +197,36 @@ def index():
             user=None,
             guilds=[],
             guilds_without_bot=[],
-            client_id=client_id
+            client_id=client_id,
+            bot_status=bot_status
         )
+
+    all_guilds = session.get("all_manageable_guilds")
+    if not all_guilds:
+        all_guilds = session.get("guilds", []) + session.get("guilds_without_bot", [])
+
+    bot_guild_ids = {str(x) for x in get_bot_guilds()}
+
+    with_bot = []
+    without_bot = []
+    for g in all_guilds:
+        gid = str(g["id"])
+        if gid in bot_guild_ids:
+            with_bot.append(g)
+        else:
+            without_bot.append(g)
+
+    session["guilds"] = with_bot
+    session["guilds_without_bot"] = without_bot
+
+    return render_template(
+        "index.html",
+        user=user,
+        guilds=with_bot,
+        guilds_without_bot=without_bot,
+        client_id=client_id,
+        bot_status=bot_status
+    )
 
     all_guilds = session.get("all_manageable_guilds")
     if not all_guilds:
