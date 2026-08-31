@@ -1,7 +1,6 @@
 import os
-import json
 import requests
-from flask import Flask, redirect, url_for, session, render_template, request, flash, get_flashed_messages
+from flask import Flask, redirect, url_for, session, render_template, request, flash
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -31,6 +30,7 @@ discord = oauth.register(
     client_kwargs={"scope": "identify guilds"}
 )
 
+
 def load_settings():
     data = {}
     if settings_collection is None:
@@ -46,6 +46,7 @@ def load_settings():
     except Exception as e:
         print(f"load_settings hata: {e}")
     return data
+
 
 def set_guild_setting(guild_id, key, value):
     if settings_collection is None:
@@ -68,73 +69,79 @@ def set_guild_setting(guild_id, key, value):
         print(f"set_guild_setting hata: {e}")
         return False
 
+
 def get_bot_guilds():
-    token = os.getenv("DISCORD_TOKEN")
-    headers = {"Authorization": f"Bot {token}"}
+    """Botun bulunduğu sunucu ID'lerini (str) döner."""
+    token = os.getenv("DISCORD_TOKEN") or os.getenv("DISCORD_BOT_TOKEN")
+    if not token:
+        print("get_bot_guilds: DISCORD_TOKEN yok")
+        return set()
+
     try:
-        response = requests.get("https://discord.com/api/users/@me/guilds", headers=headers)
+        response = requests.get(
+            "https://discord.com/api/v10/users/@me/guilds",
+            headers={
+                "Authorization": f"Bot {token}",
+                "User-Agent": "RavexPanel (https://ravex-panel.onrender.com, 1.0)"
+            },
+            timeout=10
+        )
         if response.status_code == 200:
-            return {g["id"] for g in response.json()}
+            data = response.json()
+            if isinstance(data, list):
+                return {str(g["id"]) for g in data if g.get("id")}
+            print(f"get_bot_guilds: beklenmeyen cevap tipi: {type(data)}")
+            return set()
+        print(f"get_bot_guilds HTTP {response.status_code}: {response.text[:200]}")
     except Exception as e:
         print(f"get_bot_guilds hata: {e}")
     return set()
 
+
 def get_bot_status():
-    """Bot token ile Discord API'ye istek atar; online + sunucu sayısı döner."""
+    """Bot online mı + kaç sunucuda + kullanıcı adı."""
     token = os.getenv("DISCORD_TOKEN") or os.getenv("DISCORD_BOT_TOKEN")
     if not token:
         return {"online": False, "guild_count": 0, "username": None}
 
     try:
-        import urllib.request
-        import json as _json
-
         headers = {
             "Authorization": f"Bot {token}",
             "User-Agent": "RavexPanel (https://ravex-panel.onrender.com, 1.0)"
         }
-
-        req = urllib.request.Request(
+        r = requests.get(
             "https://discord.com/api/v10/users/@me",
-            headers=headers
+            headers=headers,
+            timeout=8
         )
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            data = _json.loads(resp.read().decode())
+        if r.status_code != 200:
+            return {"online": False, "guild_count": 0, "username": None}
 
-        guild_count = 0
-        try:
-            req2 = urllib.request.Request(
-                "https://discord.com/api/v10/users/@me/guilds",
-                headers=headers
-            )
-            with urllib.request.urlopen(req2, timeout=8) as resp2:
-                guilds = _json.loads(resp2.read().decode())
-                if isinstance(guilds, list):
-                    guild_count = len(guilds)
-        except Exception:
-            pass
-
+        data = r.json()
+        guild_ids = get_bot_guilds()
         return {
             "online": True,
-            "guild_count": guild_count,
+            "guild_count": len(guild_ids),
             "username": data.get("username"),
         }
     except Exception:
         return {"online": False, "guild_count": 0, "username": None}
 
+
 def get_user_guilds_split(user_guilds, bot_guild_ids):
-    """Botun olduğu ve olmadığı sunucuları ayırır"""
+    """Kullanıcının yönettiği sunucuları bot var / yok diye ayırır."""
     with_bot = []
     without_bot = []
+    bot_ids = {str(x) for x in bot_guild_ids}
 
     for guild in user_guilds:
-        guild_id = guild["id"]
+        guild_id = str(guild["id"])
         permissions = int(guild.get("permissions", 0))
-        is_owner = guild.get("owner", False)
-        is_admin = (permissions & 0x8) == 0x8
+        is_owner = bool(guild.get("owner", False))
+        is_admin = (permissions & 0x8) == 0x8          # Administrator
+        can_manage = (permissions & 0x20) == 0x20      # Manage Guild
 
-        # Sadece yönetici / sahip olduğu sunucular
-        if not (is_owner or is_admin):
+        if not (is_owner or is_admin or can_manage):
             continue
 
         info = {
@@ -144,20 +151,26 @@ def get_user_guilds_split(user_guilds, bot_guild_ids):
             "owner": is_owner
         }
 
-        if guild_id in bot_guild_ids:
+        if guild_id in bot_ids:
             with_bot.append(info)
         else:
             without_bot.append(info)
 
     return with_bot, without_bot
 
+
 def get_guild_roles(guild_id):
-    token = os.getenv("DISCORD_TOKEN")
-    headers = {"Authorization": f"Bot {token}"}
+    token = os.getenv("DISCORD_TOKEN") or os.getenv("DISCORD_BOT_TOKEN")
+    if not token:
+        return []
     try:
         response = requests.get(
-            f"https://discord.com/api/guilds/{guild_id}/roles",
-            headers=headers
+            f"https://discord.com/api/v10/guilds/{guild_id}/roles",
+            headers={
+                "Authorization": f"Bot {token}",
+                "User-Agent": "RavexPanel (https://ravex-panel.onrender.com, 1.0)"
+            },
+            timeout=10
         )
         if response.status_code == 200:
             roles = response.json()
@@ -168,22 +181,29 @@ def get_guild_roles(guild_id):
         print(f"get_guild_roles hata: {e}")
     return []
 
+
 def get_guild_channels(guild_id):
-    token = os.getenv("DISCORD_TOKEN")
-    headers = {"Authorization": f"Bot {token}"}
+    token = os.getenv("DISCORD_TOKEN") or os.getenv("DISCORD_BOT_TOKEN")
+    if not token:
+        return []
     try:
         response = requests.get(
-            f"https://discord.com/api/guilds/{guild_id}/channels",
-            headers=headers
+            f"https://discord.com/api/v10/guilds/{guild_id}/channels",
+            headers={
+                "Authorization": f"Bot {token}",
+                "User-Agent": "RavexPanel (https://ravex-panel.onrender.com, 1.0)"
+            },
+            timeout=10
         )
         if response.status_code == 200:
             channels = response.json()
-            text_channels = [c for c in channels if c["type"] == 0]
+            text_channels = [c for c in channels if c.get("type") == 0]
             text_channels.sort(key=lambda c: c["name"].lower())
             return text_channels
     except Exception as e:
         print(f"get_guild_channels hata: {e}")
     return []
+
 
 @app.route("/")
 def index():
@@ -205,7 +225,7 @@ def index():
     if not all_guilds:
         all_guilds = session.get("guilds", []) + session.get("guilds_without_bot", [])
 
-    bot_guild_ids = {str(x) for x in get_bot_guilds()}
+    bot_guild_ids = get_bot_guilds()
 
     with_bot = []
     without_bot = []
@@ -228,56 +248,20 @@ def index():
         bot_status=bot_status
     )
 
-    all_guilds = session.get("all_manageable_guilds")
-    if not all_guilds:
-        all_guilds = session.get("guilds", []) + session.get("guilds_without_bot", [])
-
-    bot_guild_ids = {str(x) for x in get_bot_guilds()}
-
-    with_bot = []
-    without_bot = []
-    for g in all_guilds:
-        gid = str(g["id"])
-        if gid in bot_guild_ids:
-            with_bot.append(g)
-        else:
-            without_bot.append(g)
-
-    session["guilds"] = with_bot
-    session["guilds_without_bot"] = without_bot
-
-    return render_template(
-        "index.html",
-        user=user,
-        guilds=with_bot,
-        guilds_without_bot=without_bot,
-        client_id=client_id
-    )
-
-    guilds = session.get("guilds", [])
-    guilds_without_bot = session.get("guilds_without_bot", [])
-    client_id = os.getenv("DISCORD_CLIENT_ID")
-
-    return render_template(
-        "index.html",
-        user=user,
-        guilds=guilds,
-        guilds_without_bot=guilds_without_bot,
-        client_id=client_id
-    )
 
 @app.route("/login")
 def login():
     redirect_uri = url_for("callback", _external=True)
     return discord.authorize_redirect(redirect_uri)
 
+
 @app.route("/callback")
 def callback():
-    token = discord.authorize_access_token()
+    discord.authorize_access_token()
     resp = discord.get("users/@me")
     user = resp.json()
     session["user"] = {
-        "id": user["id"],
+        "id": str(user["id"]),
         "username": user["username"],
         "avatar": user.get("avatar"),
         "discriminator": user.get("discriminator", "0")
@@ -285,29 +269,24 @@ def callback():
 
     guilds_resp = discord.get("users/@me/guilds")
     user_guilds = guilds_resp.json()
-    bot_guild_ids = get_bot_guilds()
+    if not isinstance(user_guilds, list):
+        user_guilds = []
 
+    bot_guild_ids = get_bot_guilds()
     with_bot, without_bot = get_user_guilds_split(user_guilds, bot_guild_ids)
+
     session["guilds"] = with_bot
     session["guilds_without_bot"] = without_bot
     session["all_manageable_guilds"] = with_bot + without_bot
 
     return redirect("/")
 
-    guilds_resp = discord.get("users/@me/guilds")
-    user_guilds = guilds_resp.json()
-    bot_guild_ids = get_bot_guilds()
-
-    with_bot, without_bot = get_user_guilds_split(user_guilds, bot_guild_ids)
-    session["guilds"] = with_bot
-    session["guilds_without_bot"] = without_bot
-
-    return redirect("/")
 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
+
 
 @app.route("/guild/<guild_id>")
 def guild_settings(guild_id):
@@ -315,8 +294,9 @@ def guild_settings(guild_id):
     if not user:
         return redirect("/")
 
+    guild_id = str(guild_id)
     guilds = session.get("guilds", [])
-    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    guild = next((g for g in guilds if str(g["id"]) == guild_id), None)
     if not guild:
         return "Bu sunucuyu yönetme yetkin yok.", 403
 
@@ -334,14 +314,16 @@ def guild_settings(guild_id):
         channels=channels
     )
 
+
 @app.route("/guild/<guild_id>/toggle/<key>", methods=["POST"])
 def toggle_setting(guild_id, key):
     user = session.get("user")
     if not user:
         return redirect("/")
 
+    guild_id = str(guild_id)
     guilds = session.get("guilds", [])
-    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    guild = next((g for g in guilds if str(g["id"]) == guild_id), None)
     if not guild:
         return "Yetkin yok.", 403
 
@@ -350,16 +332,19 @@ def toggle_setting(guild_id, key):
         "guard_webhook", "guard_rightclick", "oto_nick",
         "seviye_sistemi", "dogum_gunu_sistemi",
         "filter_kufur", "filter_reklam", "filter_caps", "filter_spam"
-]
+    ]
     if key not in allowed_keys:
         return "Geçersiz ayar.", 400
 
     settings = load_settings()
-    current = settings.get(guild_id, {}).get(key, False)
-    set_guild_setting(guild_id, key, not current)
+    # Varsayılanı True olan filtreler / seviye
+    default_true = {"filter_kufur", "filter_reklam", "filter_caps", "filter_spam", "seviye_sistemi"}
+    current = settings.get(guild_id, {}).get(key, key in default_true)
+    set_guild_setting(guild_id, key, not bool(current))
 
     flash("Ayar güncellendi.", "success")
     return redirect(f"/guild/{guild_id}")
+
 
 @app.route("/guild/<guild_id>/update", methods=["POST"])
 def update_setting(guild_id):
@@ -367,8 +352,9 @@ def update_setting(guild_id):
     if not user:
         return redirect("/")
 
+    guild_id = str(guild_id)
     guilds = session.get("guilds", [])
-    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    guild = next((g for g in guilds if str(g["id"]) == guild_id), None)
     if not guild:
         return "Yetkin yok.", 403
 
@@ -379,8 +365,8 @@ def update_setting(guild_id):
         "ust_yetkili_rol", "yetkili_rol", "oto_rol",
         "kayitsiz_rol", "aile_rol", "jail_rol",
         "log_kanali", "ticket_log_kanali",
-        "kurallar_kanali", "hosgeldin_kanali", "tuzak_kanali", "dogum_gunu_rol",
-        "dogum_gunu_kanali"
+        "kurallar_kanali", "hosgeldin_kanali", "tuzak_kanali",
+        "dogum_gunu_rol", "dogum_gunu_kanali"
     ]
     if key not in allowed_keys:
         return "Geçersiz ayar.", 400
@@ -396,14 +382,16 @@ def update_setting(guild_id):
     flash("Ayar kaydedildi.", "success")
     return redirect(f"/guild/{guild_id}")
 
+
 @app.route("/guild/<guild_id>/kufur", methods=["POST"])
 def kufur_islem(guild_id):
     user = session.get("user")
     if not user:
         return redirect("/")
 
+    guild_id = str(guild_id)
     guilds = session.get("guilds", [])
-    guild = next((g for g in guilds if g["id"] == guild_id), None)
+    guild = next((g for g in guilds if str(g["id"]) == guild_id), None)
     if not guild:
         return "Yetkin yok.", 403
 
@@ -412,7 +400,7 @@ def kufur_islem(guild_id):
 
     VARSAYILAN = ["amk", "aq", "orospu", "piç", "sik", "yarrak", "ibne", "göt"]
     settings = load_settings()
-    liste = settings.get(guild_id, {}).get("kufur_listesi", list(VARSAYILAN))
+    liste = list(settings.get(guild_id, {}).get("kufur_listesi", list(VARSAYILAN)))
 
     if action == "ekle" and kelime:
         if kelime not in liste:
@@ -426,6 +414,7 @@ def kufur_islem(guild_id):
     set_guild_setting(guild_id, "kufur_listesi", liste)
     flash("Küfür listesi güncellendi.", "success")
     return redirect(f"/guild/{guild_id}")
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
