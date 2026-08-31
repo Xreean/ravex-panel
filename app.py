@@ -1,4 +1,5 @@
 import os
+import datetime
 import requests
 from flask import Flask, redirect, url_for, session, render_template, request, flash
 from authlib.integrations.flask_client import OAuth
@@ -17,6 +18,7 @@ MONGO_URI = os.getenv("MONGO_URI")
 mongo_client = MongoClient(MONGO_URI) if MONGO_URI else None
 mongo_db = mongo_client["ravex"] if mongo_client is not None else None
 settings_collection = mongo_db["ayarlar"] if mongo_db is not None else None
+audit_collection = mongo_db["audit_log"] if mongo_db is not None else None
 
 # Discord OAuth
 oauth = OAuth(app)
@@ -70,6 +72,52 @@ def set_guild_setting(guild_id, key, value):
         return False
 
 
+def add_audit_log(guild_id, user, action, detail):
+    """Ayar değişikliğini kaydet."""
+    if audit_collection is None:
+        return
+    try:
+        audit_collection.insert_one({
+            "guild_id": str(guild_id),
+            "user_id": str(user.get("id", "")),
+            "username": user.get("username", "?"),
+            "action": action,
+            "detail": detail,
+            "created_at": datetime.datetime.now(datetime.timezone.utc)
+        })
+    except Exception as e:
+        print(f"add_audit_log hata: {e}")
+
+
+def get_audit_logs(guild_id, limit=20):
+    if audit_collection is None:
+        return []
+    try:
+        cursor = (
+            audit_collection
+            .find({"guild_id": str(guild_id)})
+            .sort("created_at", -1)
+            .limit(limit)
+        )
+        logs = []
+        for doc in cursor:
+            created = doc.get("created_at")
+            if isinstance(created, datetime.datetime):
+                created_str = created.strftime("%d.%m.%Y %H:%M")
+            else:
+                created_str = str(created or "")
+            logs.append({
+                "username": doc.get("username", "?"),
+                "action": doc.get("action", ""),
+                "detail": doc.get("detail", ""),
+                "created_at": created_str
+            })
+        return logs
+    except Exception as e:
+        print(f"get_audit_logs hata: {e}")
+        return []
+
+
 def bot_headers():
     token = os.getenv("DISCORD_TOKEN") or os.getenv("DISCORD_BOT_TOKEN")
     if not token:
@@ -81,7 +129,6 @@ def bot_headers():
 
 
 def bot_is_in_guild(guild_id):
-    """Bot o sunucuda üye mi? GET /guilds/{id} ile kesin kontrol."""
     headers = bot_headers()
     if not headers:
         return False
@@ -98,37 +145,30 @@ def bot_is_in_guild(guild_id):
 
 
 def get_bot_guilds():
-    """Botun bulunduğu sunucu ID'lerini (str) döner."""
     headers = bot_headers()
     if not headers:
         print("get_bot_guilds: DISCORD_TOKEN yok")
         return set()
-
     try:
         response = requests.get(
             "https://discord.com/api/v10/users/@me/guilds",
             headers=headers,
             timeout=10
         )
-        print(f"get_bot_guilds status={response.status_code}")
         if response.status_code == 200:
             data = response.json()
             if isinstance(data, list):
-                ids = {str(g["id"]) for g in data if g.get("id")}
-                print(f"get_bot_guilds ids={ids}")
-                return ids
-        print(f"get_bot_guilds body={response.text[:300]}")
+                return {str(g["id"]) for g in data if g.get("id")}
+        print(f"get_bot_guilds status={response.status_code}")
     except Exception as e:
         print(f"get_bot_guilds hata: {e}")
     return set()
 
 
 def get_bot_status():
-    """Bot online mı + kaç sunucuda + kullanıcı adı."""
     headers = bot_headers()
     if not headers:
         return {"online": False, "guild_count": 0, "username": None}
-
     try:
         r = requests.get(
             "https://discord.com/api/v10/users/@me",
@@ -137,12 +177,10 @@ def get_bot_status():
         )
         if r.status_code != 200:
             return {"online": False, "guild_count": 0, "username": None}
-
         data = r.json()
-        guild_ids = get_bot_guilds()
         return {
             "online": True,
-            "guild_count": len(guild_ids),
+            "guild_count": len(get_bot_guilds()),
             "username": data.get("username"),
         }
     except Exception:
@@ -218,13 +256,11 @@ def index():
         all_guilds = session.get("guilds", []) + session.get("guilds_without_bot", [])
 
     bot_guild_ids = get_bot_guilds()
-
     with_bot = []
     without_bot = []
     for g in all_guilds:
         gid = str(g["id"])
         in_bot = gid in bot_guild_ids or bot_is_in_guild(gid)
-        print(f"guild check: {g.get('name')} id={gid} in_bot={in_bot}")
         if in_bot:
             with_bot.append(g)
         else:
@@ -267,13 +303,11 @@ def callback():
         user_guilds = []
 
     bot_guild_ids = get_bot_guilds()
-
     with_bot = []
     without_bot = []
     for guild in user_guilds:
         if not can_manage_guild(guild):
             continue
-
         guild_id = str(guild["id"])
         info = {
             "id": guild_id,
@@ -281,9 +315,7 @@ def callback():
             "icon": guild.get("icon"),
             "owner": bool(guild.get("owner", False))
         }
-        in_bot = guild_id in bot_guild_ids or bot_is_in_guild(guild_id)
-        print(f"callback check: {info['name']} id={guild_id} in_bot={in_bot}")
-        if in_bot:
+        if guild_id in bot_guild_ids or bot_is_in_guild(guild_id):
             with_bot.append(info)
         else:
             without_bot.append(info)
@@ -316,6 +348,7 @@ def guild_settings(guild_id):
     guild_settings = settings.get(guild_id, {})
     roles = get_guild_roles(guild_id)
     channels = get_guild_channels(guild_id)
+    audit_logs = get_audit_logs(guild_id, 20)
 
     return render_template(
         "settings.html",
@@ -323,7 +356,8 @@ def guild_settings(guild_id):
         guild=guild,
         settings=guild_settings,
         roles=roles,
-        channels=channels
+        channels=channels,
+        audit_logs=audit_logs
     )
 
 
@@ -354,7 +388,15 @@ def toggle_setting(guild_id, key):
         "filter_spam", "seviye_sistemi"
     }
     current = settings.get(guild_id, {}).get(key, key in default_true)
-    set_guild_setting(guild_id, key, not bool(current))
+    new_value = not bool(current)
+    set_guild_setting(guild_id, key, new_value)
+
+    add_audit_log(
+        guild_id,
+        user,
+        "toggle",
+        f"{key} → {'Açık' if new_value else 'Kapalı'}"
+    )
 
     flash("Ayar güncellendi.", "success")
     return redirect(f"/guild/{guild_id}")
@@ -387,12 +429,15 @@ def update_setting(guild_id):
 
     if value == "":
         set_guild_setting(guild_id, key, None)
+        detail = f"{key} temizlendi"
     else:
         if not value.isdigit():
             flash("Geçersiz ID.", "success")
             return redirect(f"/guild/{guild_id}")
         set_guild_setting(guild_id, key, int(value))
+        detail = f"{key} = {value}"
 
+    add_audit_log(guild_id, user, "update", detail)
     flash("Ayar kaydedildi.", "success")
     return redirect(f"/guild/{guild_id}")
 
@@ -419,13 +464,19 @@ def kufur_islem(guild_id):
     if action == "ekle" and kelime:
         if kelime not in liste:
             liste.append(kelime)
+        detail = f"küfür eklendi: {kelime}"
     elif action == "sil" and kelime:
         if kelime in liste:
             liste.remove(kelime)
+        detail = f"küfür silindi: {kelime}"
     elif action == "sifirla":
         liste = list(VARSAYILAN)
+        detail = "küfür listesi sıfırlandı"
+    else:
+        detail = "küfür listesi güncellendi"
 
     set_guild_setting(guild_id, "kufur_listesi", liste)
+    add_audit_log(guild_id, user, "kufur", detail)
     flash("Küfür listesi güncellendi.", "success")
     return redirect(f"/guild/{guild_id}")
 
