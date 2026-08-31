@@ -277,6 +277,7 @@ def toggle_setting(guild_id, key):
         "guard_kanal", "guard_rol", "guard_bot",
         "guard_webhook", "guard_rightclick", "oto_nick",
         "seviye_sistemi", "dogum_gunu_sistemi"
+        "filter_kufur", "filter_reklam", "filter_caps", "filter_spam"
 ]
     if key not in allowed_keys:
         return "Geçersiz ayar.", 400
