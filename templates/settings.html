@@ -47,7 +47,7 @@
         .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); }
         .nav-back { color: #8b90a0; text-decoration: none; font-size: 13px; font-weight: 500; }
         .nav-back:hover { color: #e8eaed; }
-        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
         .user-info img { width: 32px; height: 32px; border-radius: 50%; }
         .user-info span { font-size: 13px; color: #c5c8d0; }
         .btn {
@@ -62,6 +62,20 @@
             background: rgba(237,66,69,0.15); color: #ff6b6e;
             border: 1px solid rgba(237,66,69,0.25);
         }
+        .lang-switch {
+            display: flex; gap: 4px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 3px;
+        }
+        .lang-btn {
+            border: none; background: transparent;
+            color: #8b90a0; font-size: 11px; font-weight: 700;
+            padding: 5px 8px; border-radius: 6px; cursor: pointer;
+            font-family: inherit;
+        }
+        .lang-btn.active { background: var(--accent); color: #fff; }
         .theme-bar { display: flex; gap: 8px; align-items: center; }
         .theme-dot {
             width: 16px; height: 16px; border-radius: 50%;
@@ -319,11 +333,15 @@
                 <span>Ravex</span>
             </a>
             <div class="nav-sep"></div>
-            <a class="nav-back" href="/">← Sunucular</a>
+            <a class="nav-back" href="/" data-i18n="back">← Sunucular</a>
             <button type="button" class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
         <div class="user-info">
-            <div class="theme-bar" title="Tema rengi">
+            <div class="lang-switch">
+                <button type="button" class="lang-btn" data-lang="tr">TR</button>
+                <button type="button" class="lang-btn" data-lang="en">EN</button>
+            </div>
+            <div class="theme-bar">
                 <span class="theme-dot" data-theme="purple"></span>
                 <span class="theme-dot" data-theme="blue"></span>
                 <span class="theme-dot" data-theme="green"></span>
@@ -332,7 +350,7 @@
             <img src="https://cdn.discordapp.com/avatars/{{ user.id }}/{{ user.avatar }}.png" alt="">
             {% endif %}
             <span>{{ user.username }}</span>
-            <a class="btn btn-danger" href="/logout">Çıkış</a>
+            <a class="btn btn-danger" href="/logout" data-i18n="logout">Çıkış</a>
         </div>
     </nav>
 
@@ -348,35 +366,35 @@
 
     <div class="layout">
         <aside class="sidebar" id="sidebar">
-            <button type="button" class="sidebar-toggle" id="sidebarToggle" title="Menüyü aç/kapa">⋯</button>
-            <div class="sidebar-title">Kategoriler</div>
+            <button type="button" class="sidebar-toggle" id="sidebarToggle" title="Menu">⋯</button>
+            <div class="sidebar-title" data-i18n="categories">Kategoriler</div>
 
             <button type="button" class="side-item active" data-panel="roller">
-                <span>⚙️</span><span class="side-item-text">Genel Roller</span><kbd>1</kbd>
+                <span>⚙️</span><span class="side-item-text" data-i18n="nav_roles">Genel Roller</span><kbd>1</kbd>
             </button>
             <button type="button" class="side-item" data-panel="kanallar">
-                <span>📜</span><span class="side-item-text">Kanallar</span><kbd>2</kbd>
+                <span>📜</span><span class="side-item-text" data-i18n="nav_channels">Kanallar</span><kbd>2</kbd>
             </button>
             <button type="button" class="side-item" data-panel="guard">
-                <span>🛡️</span><span class="side-item-text">Guard</span><kbd>3</kbd>
+                <span>🛡️</span><span class="side-item-text" data-i18n="nav_guard">Guard</span><kbd>3</kbd>
             </button>
             <button type="button" class="side-item" data-panel="filtreler">
-                <span>🚫</span><span class="side-item-text">Mesaj Filtreleri</span><kbd>4</kbd>
+                <span>🚫</span><span class="side-item-text" data-i18n="nav_filters">Mesaj Filtreleri</span><kbd>4</kbd>
             </button>
             <button type="button" class="side-item" data-panel="nick">
-                <span>📛</span><span class="side-item-text">Nick Sistemi</span><kbd>5</kbd>
+                <span>📛</span><span class="side-item-text" data-i18n="nav_nick">Nick Sistemi</span><kbd>5</kbd>
             </button>
             <button type="button" class="side-item" data-panel="seviye">
-                <span>📊</span><span class="side-item-text">Seviye</span><kbd>6</kbd>
+                <span>📊</span><span class="side-item-text" data-i18n="nav_level">Seviye</span><kbd>6</kbd>
             </button>
             <button type="button" class="side-item" data-panel="dogumgunu">
-                <span>🎂</span><span class="side-item-text">Doğum Günü</span><kbd>7</kbd>
+                <span>🎂</span><span class="side-item-text" data-i18n="nav_birthday">Doğum Günü</span><kbd>7</kbd>
             </button>
             <button type="button" class="side-item" data-panel="kufur">
-                <span>🤬</span><span class="side-item-text">Küfür Listesi</span><kbd>8</kbd>
+                <span>🤬</span><span class="side-item-text" data-i18n="nav_swear">Küfür Listesi</span><kbd>8</kbd>
             </button>
             <button type="button" class="side-item" data-panel="gecmis">
-                <span>📋</span><span class="side-item-text">Geçmiş</span><kbd>9</kbd>
+                <span>📋</span><span class="side-item-text" data-i18n="nav_history">Geçmiş</span><kbd>9</kbd>
             </button>
         </aside>
 
@@ -389,7 +407,7 @@
                 </div>
                 <div class="guild-header-meta">
                     <h2>{{ gname }}</h2>
-                    <span class="guild-header-badge">Ayarlar</span>
+                    <span class="guild-header-badge" data-i18n="settings_badge">Ayarlar</span>
                 </div>
             </div>
 
@@ -403,52 +421,62 @@
 
             <div class="summary">
                 <div class="summary-card">
-                    <div class="label">Guard</div>
-                    <div class="value {{ 'on' if ns.guard_on else 'off' }}">{{ ns.guard_on }}/5 açık</div>
-                </div>
-                <div class="summary-card">
-                    <div class="label">Mesaj Filtreleri</div>
-                    <div class="value {{ 'on' if ns.filt_on else 'off' }}">{{ ns.filt_on }}/4 açık</div>
-                </div>
-                <div class="summary-card">
-                    <div class="label">Seviye</div>
-                    <div class="value {{ 'on' if settings.get('seviye_sistemi', True) else 'off' }}">
-                        {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
+                    <div class="label" data-i18n="sum_guard">Guard</div>
+                    <div class="value {{ 'on' if ns.guard_on else 'off' }}">
+                        <span id="sum-guard-val">{{ ns.guard_on }}/5</span>
+                        <span data-i18n="open_count">açık</span>
                     </div>
                 </div>
                 <div class="summary-card">
-                    <div class="label">Doğum Günü</div>
+                    <div class="label" data-i18n="sum_filters">Mesaj Filtreleri</div>
+                    <div class="value {{ 'on' if ns.filt_on else 'off' }}">
+                        <span id="sum-filt-val">{{ ns.filt_on }}/4</span>
+                        <span data-i18n="open_count">açık</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="label" data-i18n="sum_level">Seviye</div>
+                    <div class="value {{ 'on' if settings.get('seviye_sistemi', True) else 'off' }}">
+                        <span data-i18n="{{ 'on' if settings.get('seviye_sistemi', True) else 'off' }}">
+                            {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="label" data-i18n="sum_birthday">Doğum Günü</div>
                     <div class="value {{ 'on' if settings.get('dogum_gunu_sistemi') else 'off' }}">
-                        {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
+                        <span data-i18n="{{ 'on' if settings.get('dogum_gunu_sistemi') else 'off' }}">
+                            {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div class="panel active" id="panel-roller">
-                <div class="panel-title">Genel Roller</div>
-                <p class="panel-desc">Yetkili, oto rol, jail ve diğer temel roller.</p>
-                <input type="text" class="search-box" data-filter="role" placeholder="Rol ara...">
+                <div class="panel-title" data-i18n="nav_roles">Genel Roller</div>
+                <p class="panel-desc" data-i18n="desc_roles">Yetkili, oto rol, jail ve diğer temel roller.</p>
+                <input type="text" class="search-box" data-filter="role" data-i18n-placeholder="search_role" placeholder="Rol ara...">
                 <div class="section">
                     {% set role_settings = [
-                        ('ust_yetkili_rol', 'Üst Yetkili Rol'),
-                        ('yetkili_rol', 'Yetkili Rol'),
-                        ('oto_rol', 'Oto Rol'),
-                        ('kayitsiz_rol', 'Kayıtsız Rol'),
-                        ('aile_rol', 'Aile Rol'),
-                        ('jail_rol', 'Jail Rol')
+                        ('ust_yetkili_rol', 'Üst Yetkili Rol', 'role_top'),
+                        ('yetkili_rol', 'Yetkili Rol', 'role_mod'),
+                        ('oto_rol', 'Oto Rol', 'role_auto'),
+                        ('kayitsiz_rol', 'Kayıtsız Rol', 'role_unreg'),
+                        ('aile_rol', 'Aile Rol', 'role_family'),
+                        ('jail_rol', 'Jail Rol', 'role_jail')
                     ] %}
-                    {% for key, label in role_settings %}
+                    {% for key, label, i18n_key in role_settings %}
                     <div class="setting-row" data-key="{{ key }}">
-                        <span class="setting-label">{{ label }}</span>
+                        <span class="setting-label" data-i18n="{{ i18n_key }}">{{ label }}</span>
                         <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
                             <input type="hidden" name="key" value="{{ key }}">
                             <select name="value" class="role-select">
-                                <option value="">— Seçilmedi —</option>
+                                <option value="" data-i18n="not_selected">— Seçilmedi —</option>
                                 {% for role in roles %}
                                 <option value="{{ role.id }}" data-name="{{ role.name|lower }}" {% if settings.get(key)|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                            <button type="submit" class="btn btn-primary" data-i18n="save">Kaydet</button>
                         </form>
                     </div>
                     {% endfor %}
@@ -456,29 +484,29 @@
             </div>
 
             <div class="panel" id="panel-kanallar">
-                <div class="panel-title">Kanallar</div>
-                <p class="panel-desc">Log, hoş geldin ve diğer kanal ayarları.</p>
-                <input type="text" class="search-box" data-filter="channel" placeholder="Kanal ara...">
+                <div class="panel-title" data-i18n="nav_channels">Kanallar</div>
+                <p class="panel-desc" data-i18n="desc_channels">Log, hoş geldin ve diğer kanal ayarları.</p>
+                <input type="text" class="search-box" data-filter="channel" data-i18n-placeholder="search_channel" placeholder="Kanal ara...">
                 <div class="section">
                     {% set channel_settings = [
-                        ('log_kanali', 'Moderasyon Log'),
-                        ('ticket_log_kanali', 'Ticket Log'),
-                        ('kurallar_kanali', 'Kurallar Kanalı'),
-                        ('hosgeldin_kanali', 'Hoş Geldin Kanalı'),
-                        ('tuzak_kanali', 'Bot Tuzağı Kanalı')
+                        ('log_kanali', 'Moderasyon Log', 'ch_log'),
+                        ('ticket_log_kanali', 'Ticket Log', 'ch_ticket'),
+                        ('kurallar_kanali', 'Kurallar Kanalı', 'ch_rules'),
+                        ('hosgeldin_kanali', 'Hoş Geldin Kanalı', 'ch_welcome'),
+                        ('tuzak_kanali', 'Bot Tuzağı Kanalı', 'ch_trap')
                     ] %}
-                    {% for key, label in channel_settings %}
+                    {% for key, label, i18n_key in channel_settings %}
                     <div class="setting-row" data-key="{{ key }}">
-                        <span class="setting-label">{{ label }}</span>
+                        <span class="setting-label" data-i18n="{{ i18n_key }}">{{ label }}</span>
                         <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="{{ key }}">
                             <input type="hidden" name="key" value="{{ key }}">
                             <select name="value" class="channel-select">
-                                <option value="">— Seçilmedi —</option>
+                                <option value="" data-i18n="not_selected">— Seçilmedi —</option>
                                 {% for channel in channels %}
                                 <option value="{{ channel.id }}" data-name="{{ channel.name|lower }}" {% if settings.get(key)|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                            <button type="submit" class="btn btn-primary" data-i18n="save">Kaydet</button>
                         </form>
                     </div>
                     {% endfor %}
@@ -486,21 +514,21 @@
             </div>
 
             <div class="panel" id="panel-guard">
-                <div class="panel-title">Guard (Koruma)</div>
-                <p class="panel-desc">İzinsiz işlemleri engelleyen koruma modülleri.</p>
+                <div class="panel-title" data-i18n="nav_guard">Guard (Koruma)</div>
+                <p class="panel-desc" data-i18n="desc_guard">İzinsiz işlemleri engelleyen koruma modülleri.</p>
                 <div class="section">
                     {% set guards = [
-                        ('guard_kanal', 'Kanal Koruması'),
-                        ('guard_rol', 'Rol Koruması'),
-                        ('guard_bot', 'Bot Koruması'),
-                        ('guard_webhook', 'Webhook Koruması'),
-                        ('guard_rightclick', 'Sağ Tık Ban/Kick')
+                        ('guard_kanal', 'Kanal Koruması', 'g_channel'),
+                        ('guard_rol', 'Rol Koruması', 'g_role'),
+                        ('guard_bot', 'Bot Koruması', 'g_bot'),
+                        ('guard_webhook', 'Webhook Koruması', 'g_webhook'),
+                        ('guard_rightclick', 'Sağ Tık Ban/Kick', 'g_rightclick')
                     ] %}
-                    {% for key, label in guards %}
+                    {% for key, label, i18n_key in guards %}
                     <div class="setting-row" data-key="{{ key }}">
-                        <span class="setting-label">{{ label }}</span>
+                        <span class="setting-label" data-i18n="{{ i18n_key }}">{{ label }}</span>
                         <form method="POST" action="/guild/{{ gid }}/toggle/{{ key }}" data-save-key="{{ key }}">
-                            <button type="submit" class="{{ 'badge-on' if settings.get(key) else 'badge-off' }}">
+                            <button type="submit" class="{{ 'badge-on' if settings.get(key) else 'badge-off' }}" data-i18n="{{ 'on' if settings.get(key) else 'off' }}">
                                 {{ 'Açık' if settings.get(key) else 'Kapalı' }}
                             </button>
                         </form>
@@ -510,20 +538,20 @@
             </div>
 
             <div class="panel" id="panel-filtreler">
-                <div class="panel-title">Mesaj Filtreleri</div>
-                <p class="panel-desc">Küfür, reklam, caps ve spam korumalarını aç / kapat.</p>
+                <div class="panel-title" data-i18n="nav_filters">Mesaj Filtreleri</div>
+                <p class="panel-desc" data-i18n="desc_filters">Küfür, reklam, caps ve spam korumalarını aç / kapat.</p>
                 <div class="section">
                     {% set filters = [
-                        ('filter_kufur', 'Küfür Filtresi'),
-                        ('filter_reklam', 'Reklam / Link Filtresi'),
-                        ('filter_caps', 'Caps Filtresi'),
-                        ('filter_spam', 'Spam Koruması')
+                        ('filter_kufur', 'Küfür Filtresi', 'f_swear'),
+                        ('filter_reklam', 'Reklam / Link Filtresi', 'f_link'),
+                        ('filter_caps', 'Caps Filtresi', 'f_caps'),
+                        ('filter_spam', 'Spam Koruması', 'f_spam')
                     ] %}
-                    {% for key, label in filters %}
+                    {% for key, label, i18n_key in filters %}
                     <div class="setting-row" data-key="{{ key }}">
-                        <span class="setting-label">{{ label }}</span>
+                        <span class="setting-label" data-i18n="{{ i18n_key }}">{{ label }}</span>
                         <form method="POST" action="/guild/{{ gid }}/toggle/{{ key }}" data-save-key="{{ key }}">
-                            <button type="submit" class="{{ 'badge-on' if settings.get(key, True) else 'badge-off' }}">
+                            <button type="submit" class="{{ 'badge-on' if settings.get(key, True) else 'badge-off' }}" data-i18n="{{ 'on' if settings.get(key, True) else 'off' }}">
                                 {{ 'Açık' if settings.get(key, True) else 'Kapalı' }}
                             </button>
                         </form>
@@ -533,13 +561,13 @@
             </div>
 
             <div class="panel" id="panel-nick">
-                <div class="panel-title">Nick Sistemi</div>
-                <p class="panel-desc">İsim | Yaş formatında takma ad sistemi.</p>
+                <div class="panel-title" data-i18n="nav_nick">Nick Sistemi</div>
+                <p class="panel-desc" data-i18n="desc_nick">İsim | Yaş formatında takma ad sistemi.</p>
                 <div class="section">
                     <div class="setting-row" data-key="oto_nick">
-                        <span class="setting-label">İsim | Yaş Nick</span>
+                        <span class="setting-label" data-i18n="nick_toggle">İsim | Yaş Nick</span>
                         <form method="POST" action="/guild/{{ gid }}/toggle/oto_nick" data-save-key="oto_nick">
-                            <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}">
+                            <button type="submit" class="{{ 'badge-on' if settings.get('oto_nick') else 'badge-off' }}" data-i18n="{{ 'on' if settings.get('oto_nick') else 'off' }}">
                                 {{ 'Açık' if settings.get('oto_nick') else 'Kapalı' }}
                             </button>
                         </form>
@@ -548,13 +576,13 @@
             </div>
 
             <div class="panel" id="panel-seviye">
-                <div class="panel-title">Seviye Sistemi</div>
-                <p class="panel-desc">Mesajlardan XP ve seviye atlama.</p>
+                <div class="panel-title" data-i18n="nav_level">Seviye Sistemi</div>
+                <p class="panel-desc" data-i18n="desc_level">Mesajlardan XP ve seviye atlama.</p>
                 <div class="section">
                     <div class="setting-row" data-key="seviye_sistemi">
-                        <span class="setting-label">Seviye / XP Sistemi</span>
+                        <span class="setting-label" data-i18n="level_toggle">Seviye / XP Sistemi</span>
                         <form method="POST" action="/guild/{{ gid }}/toggle/seviye_sistemi" data-save-key="seviye_sistemi">
-                            <button type="submit" class="{{ 'badge-on' if settings.get('seviye_sistemi', True) else 'badge-off' }}">
+                            <button type="submit" class="{{ 'badge-on' if settings.get('seviye_sistemi', True) else 'badge-off' }}" data-i18n="{{ 'on' if settings.get('seviye_sistemi', True) else 'off' }}">
                                 {{ 'Açık' if settings.get('seviye_sistemi', True) else 'Kapalı' }}
                             </button>
                         </form>
@@ -563,54 +591,54 @@
             </div>
 
             <div class="panel" id="panel-dogumgunu">
-                <div class="panel-title">Doğum Günü Sistemi</div>
-                <p class="panel-desc">Doğum gününde rol ve duyuru ayarları.</p>
+                <div class="panel-title" data-i18n="nav_birthday">Doğum Günü Sistemi</div>
+                <p class="panel-desc" data-i18n="desc_birthday">Doğum gününde rol ve duyuru ayarları.</p>
                 <div class="section">
                     <div class="setting-row" data-key="dogum_gunu_sistemi">
-                        <span class="setting-label">Doğum Günü Sistemi</span>
+                        <span class="setting-label" data-i18n="bday_toggle">Doğum Günü Sistemi</span>
                         <form method="POST" action="/guild/{{ gid }}/toggle/dogum_gunu_sistemi" data-save-key="dogum_gunu_sistemi">
-                            <button type="submit" class="{{ 'badge-on' if settings.get('dogum_gunu_sistemi') else 'badge-off' }}">
+                            <button type="submit" class="{{ 'badge-on' if settings.get('dogum_gunu_sistemi') else 'badge-off' }}" data-i18n="{{ 'on' if settings.get('dogum_gunu_sistemi') else 'off' }}">
                                 {{ 'Açık' if settings.get('dogum_gunu_sistemi') else 'Kapalı' }}
                             </button>
                         </form>
                     </div>
                     <div class="setting-row" data-key="dogum_gunu_rol">
-                        <span class="setting-label">Doğum Günü Rolü</span>
+                        <span class="setting-label" data-i18n="bday_role">Doğum Günü Rolü</span>
                         <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_rol">
                             <input type="hidden" name="key" value="dogum_gunu_rol">
                             <select name="value" class="role-select">
-                                <option value="">— Seçilmedi —</option>
+                                <option value="" data-i18n="not_selected">— Seçilmedi —</option>
                                 {% for role in roles %}
                                 <option value="{{ role.id }}" data-name="{{ role.name|lower }}" {% if settings.get('dogum_gunu_rol')|string == role.id|string %}selected{% endif %}>{{ role.name }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                            <button type="submit" class="btn btn-primary" data-i18n="save">Kaydet</button>
                         </form>
                     </div>
                     <div class="setting-row" data-key="dogum_gunu_kanali">
-                        <span class="setting-label">Duyuru Kanalı</span>
+                        <span class="setting-label" data-i18n="bday_channel">Duyuru Kanalı</span>
                         <form method="POST" action="/guild/{{ gid }}/update" style="display:flex; gap:8px; align-items:center;" data-save-key="dogum_gunu_kanali">
                             <input type="hidden" name="key" value="dogum_gunu_kanali">
                             <select name="value" class="channel-select">
-                                <option value="">— Seçilmedi —</option>
+                                <option value="" data-i18n="not_selected">— Seçilmedi —</option>
                                 {% for channel in channels %}
                                 <option value="{{ channel.id }}" data-name="{{ channel.name|lower }}" {% if settings.get('dogum_gunu_kanali')|string == channel.id|string %}selected{% endif %}>#{{ channel.name }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                            <button type="submit" class="btn btn-primary" data-i18n="save">Kaydet</button>
                         </form>
                     </div>
                 </div>
             </div>
 
             <div class="panel" id="panel-kufur">
-                <div class="panel-title">Küfür Listesi</div>
-                <p class="panel-desc">Engellenecek kelimeleri yönet. (Küfür filtresi açıksa kullanılır)</p>
+                <div class="panel-title" data-i18n="nav_swear">Küfür Listesi</div>
+                <p class="panel-desc" data-i18n="desc_swear">Engellenecek kelimeleri yönet. (Küfür filtresi açıksa kullanılır)</p>
                 <div class="section" style="padding: 16px 20px;">
                     <form method="POST" action="/guild/{{ gid }}/kufur" class="kufur-form">
                         <input type="hidden" name="action" value="ekle">
-                        <input type="text" name="kelime" placeholder="Eklenecek kelime">
-                        <button type="submit" class="btn btn-primary">Ekle</button>
+                        <input type="text" name="kelime" data-i18n-placeholder="swear_placeholder" placeholder="Eklenecek kelime">
+                        <button type="submit" class="btn btn-primary" data-i18n="add">Ekle</button>
                     </form>
                     <div class="kufur-tags">
                         {% set kufur_listesi = settings.get('kufur_listesi', ['amk', 'aq', 'orospu', 'piç', 'sik', 'yarrak', 'ibne', 'göt']) %}
@@ -624,14 +652,14 @@
                     </div>
                     <form method="POST" action="/guild/{{ gid }}/kufur">
                         <input type="hidden" name="action" value="sifirla">
-                        <button type="submit" class="btn btn-danger">Listeyi Varsayılana Sıfırla</button>
+                        <button type="submit" class="btn btn-danger" data-i18n="reset_list">Listeyi Varsayılana Sıfırla</button>
                     </form>
                 </div>
             </div>
 
             <div class="panel" id="panel-gecmis">
-                <div class="panel-title">Değişiklik Geçmişi</div>
-                <p class="panel-desc">Bu sunucuda yapılan son ayar değişiklikleri.</p>
+                <div class="panel-title" data-i18n="nav_history">Değişiklik Geçmişi</div>
+                <p class="panel-desc" data-i18n="desc_history">Bu sunucuda yapılan son ayar değişiklikleri.</p>
                 <div class="section" style="padding: 12px 16px;">
                     {% if audit_logs %}
                         {% for log in audit_logs %}
@@ -645,18 +673,110 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div style="padding: 18px 4px; color:#8b90a0; font-size:13px;">
+                        <div style="padding: 18px 4px; color:#8b90a0; font-size:13px;" data-i18n="no_history">
                             Henüz kayıt yok. Bir ayar değişince burada görünecek.
                         </div>
                     {% endif %}
                 </div>
             </div>
 
-            <p class="hint">Kısayollar: klavyeden 1–9 ile kategoriler arası geçiş</p>
+            <p class="hint" data-i18n="hint_keys">Kısayollar: klavyeden 1–9 ile kategoriler arası geçiş</p>
         </main>
     </div>
 
     <script>
+        const I18N = {
+            tr: {
+                back: "← Sunucular", logout: "Çıkış", categories: "Kategoriler",
+                nav_roles: "Genel Roller", nav_channels: "Kanallar", nav_guard: "Guard",
+                nav_filters: "Mesaj Filtreleri", nav_nick: "Nick Sistemi", nav_level: "Seviye",
+                nav_birthday: "Doğum Günü", nav_swear: "Küfür Listesi", nav_history: "Geçmiş",
+                settings_badge: "Ayarlar",
+                sum_guard: "Guard", sum_filters: "Mesaj Filtreleri", sum_level: "Seviye", sum_birthday: "Doğum Günü",
+                open_count: "açık", on: "Açık", off: "Kapalı",
+                desc_roles: "Yetkili, oto rol, jail ve diğer temel roller.",
+                desc_channels: "Log, hoş geldin ve diğer kanal ayarları.",
+                desc_guard: "İzinsiz işlemleri engelleyen koruma modülleri.",
+                desc_filters: "Küfür, reklam, caps ve spam korumalarını aç / kapat.",
+                desc_nick: "İsim | Yaş formatında takma ad sistemi.",
+                desc_level: "Mesajlardan XP ve seviye atlama.",
+                desc_birthday: "Doğum gününde rol ve duyuru ayarları.",
+                desc_swear: "Engellenecek kelimeleri yönet. (Küfür filtresi açıksa kullanılır)",
+                desc_history: "Bu sunucuda yapılan son ayar değişiklikleri.",
+                search_role: "Rol ara...", search_channel: "Kanal ara...",
+                not_selected: "— Seçilmedi —", save: "Kaydet", add: "Ekle",
+                role_top: "Üst Yetkili Rol", role_mod: "Yetkili Rol", role_auto: "Oto Rol",
+                role_unreg: "Kayıtsız Rol", role_family: "Aile Rol", role_jail: "Jail Rol",
+                ch_log: "Moderasyon Log", ch_ticket: "Ticket Log", ch_rules: "Kurallar Kanalı",
+                ch_welcome: "Hoş Geldin Kanalı", ch_trap: "Bot Tuzağı Kanalı",
+                g_channel: "Kanal Koruması", g_role: "Rol Koruması", g_bot: "Bot Koruması",
+                g_webhook: "Webhook Koruması", g_rightclick: "Sağ Tık Ban/Kick",
+                f_swear: "Küfür Filtresi", f_link: "Reklam / Link Filtresi", f_caps: "Caps Filtresi", f_spam: "Spam Koruması",
+                nick_toggle: "İsim | Yaş Nick", level_toggle: "Seviye / XP Sistemi",
+                bday_toggle: "Doğum Günü Sistemi", bday_role: "Doğum Günü Rolü", bday_channel: "Duyuru Kanalı",
+                swear_placeholder: "Eklenecek kelime", reset_list: "Listeyi Varsayılana Sıfırla",
+                no_history: "Henüz kayıt yok. Bir ayar değişince burada görünecek.",
+                hint_keys: "Kısayollar: klavyeden 1–9 ile kategoriler arası geçiş"
+            },
+            en: {
+                back: "← Servers", logout: "Log out", categories: "Categories",
+                nav_roles: "Roles", nav_channels: "Channels", nav_guard: "Guard",
+                nav_filters: "Message Filters", nav_nick: "Nick System", nav_level: "Level",
+                nav_birthday: "Birthday", nav_swear: "Swear List", nav_history: "History",
+                settings_badge: "Settings",
+                sum_guard: "Guard", sum_filters: "Message Filters", sum_level: "Level", sum_birthday: "Birthday",
+                open_count: "on", on: "On", off: "Off",
+                desc_roles: "Staff, auto role, jail and other core roles.",
+                desc_channels: "Log, welcome and other channel settings.",
+                desc_guard: "Protection modules against unauthorized actions.",
+                desc_filters: "Toggle swear, invite/link, caps and spam filters.",
+                desc_nick: "Name | Age nickname system.",
+                desc_level: "XP and leveling from messages.",
+                desc_birthday: "Birthday role and announcement settings.",
+                desc_swear: "Manage blocked words. (Used when swear filter is on)",
+                desc_history: "Recent setting changes on this server.",
+                search_role: "Search roles...", search_channel: "Search channels...",
+                not_selected: "— Not selected —", save: "Save", add: "Add",
+                role_top: "Top Staff Role", role_mod: "Staff Role", role_auto: "Auto Role",
+                role_unreg: "Unregistered Role", role_family: "Family Role", role_jail: "Jail Role",
+                ch_log: "Moderation Log", ch_ticket: "Ticket Log", ch_rules: "Rules Channel",
+                ch_welcome: "Welcome Channel", ch_trap: "Bot Trap Channel",
+                g_channel: "Channel Protection", g_role: "Role Protection", g_bot: "Bot Protection",
+                g_webhook: "Webhook Protection", g_rightclick: "Right-click Ban/Kick",
+                f_swear: "Swear Filter", f_link: "Invite / Link Filter", f_caps: "Caps Filter", f_spam: "Spam Protection",
+                nick_toggle: "Name | Age Nick", level_toggle: "Level / XP System",
+                bday_toggle: "Birthday System", bday_role: "Birthday Role", bday_channel: "Announcement Channel",
+                swear_placeholder: "Word to add", reset_list: "Reset to Default",
+                no_history: "No records yet. Changes will appear here.",
+                hint_keys: "Shortcuts: press 1–9 to switch categories"
+            }
+        };
+
+        function applyLang(lang) {
+            const dict = I18N[lang] || I18N.tr;
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const key = el.getAttribute("data-i18n");
+                if (dict[key] != null) el.innerHTML = dict[key];
+            });
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+                const key = el.getAttribute("data-i18n-placeholder");
+                if (dict[key] != null) el.setAttribute("placeholder", dict[key]);
+            });
+            document.querySelectorAll("option[data-i18n]").forEach(el => {
+                const key = el.getAttribute("data-i18n");
+                if (dict[key] != null) el.textContent = dict[key];
+            });
+            document.querySelectorAll(".lang-btn").forEach(b => {
+                b.classList.toggle("active", b.dataset.lang === lang);
+            });
+            document.documentElement.lang = lang;
+            localStorage.setItem("ravex_lang", lang);
+        }
+
+        document.querySelectorAll(".lang-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyLang(btn.dataset.lang));
+        });
+
         const items = document.querySelectorAll('.side-item');
         const panels = document.querySelectorAll('.panel');
         const sidebar = document.getElementById('sidebar');
@@ -714,6 +834,7 @@
             d.addEventListener('click', () => applyTheme(d.dataset.theme));
         });
         applyTheme(localStorage.getItem('ravex_theme') || 'purple');
+        applyLang(localStorage.getItem('ravex_lang') || 'tr');
 
         document.querySelectorAll('.search-box').forEach(box => {
             box.addEventListener('input', () => {
